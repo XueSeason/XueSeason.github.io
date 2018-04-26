@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+
+  <meta name="description" content="关于 SlidePlus Hybrid 开发的一些总结"/>
+
+
+
+
+  <meta name="keywords" content="developer" />
+
+
+
+
+
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Code Craft">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.6.0" />
+
+
+
+<link rel="canonical" href="http://code.xnix.me/2016/09/12/关于-SlidePlus-Hybrid-开发的一些总结/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
+
+
+
+
+
+
+  
+  <script id="baidu_analytics">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e509e1f2c72a7907e19e99765a50b858";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.1.1/av-min.js"></script>
+  <script id="leancloud">
+    AV.init({
+      appId: "1KzfleDz7INCo32JTaHqqTNL-9Nh9j0Va",
+      appKey: "iB34bYSRr6XLtbwubkyvGGoH"
+    });
+  </script>
+
+
+
+
+
+    <title> 关于 SlidePlus Hybrid 开发的一些总结 - Code Craft </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">Code Craft</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            首页
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            归档
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Code Craft</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              首页
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              归档
+            
+          </a>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          关于 SlidePlus Hybrid 开发的一些总结
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2016-09-12
+        </span>
+        
+        
+        <div class="post-visits"
+             data-url="/2016/09/12/关于-SlidePlus-Hybrid-开发的一些总结/"
+             data-title="关于 SlidePlus Hybrid 开发的一些总结">
+            阅读次数
+          </div>
+        
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前端视频播放的兼容性问题"><span class="toc-text">前端视频播放的兼容性问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hybrid-开发和调试环境的问题"><span class="toc-text">Hybrid 开发和调试环境的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hybrid-的用户体验问题"><span class="toc-text">Hybrid 的用户体验问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hyrbid-的优缺点"><span class="toc-text">Hyrbid 的优缺点</span></a></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <p>本次总结包括以下几点：<br><a id="more"></a></p>
+<ol>
+<li>前端视频播放的兼容性问题</li>
+<li>Hybrid 开发和调试环境的问题</li>
+<li>Hybrid 的用户体验问题</li>
+<li>Hyrbid 的优缺点</li>
+</ol>
+<h2 id="前端视频播放的兼容性问题"><a href="#前端视频播放的兼容性问题" class="headerlink" title="前端视频播放的兼容性问题"></a>前端视频播放的兼容性问题</h2><p>首先，iPhone 上播放视频方案，我们直接忽略掉 Flash，Safari Mobile 完全不支持。所以重点考虑 HTML5 的方式播放视频，好在 Safari 兼容 video 非常完美。<br>不过又带来另外一个问题，Safari 播放 HTML5 视频，系统会自动放大全屏，即便是使用了 inline 模式，依旧没有效果。<br>再说说 Android 平台上，从下图可以看到 Android 4.4 以上是完美支持 video 的，之前的版本可能存在兼容性，解决方案就是当不支持 HTML5 视频播放时，退一步采用 Flash 方案。但是这也带来另外一个工作量，就是需要完成两套视频播放器界面的 UI。</p>
+<p><img src="http://ww1.sinaimg.cn/large/aa0fbcc4gw1f7r2gl7h8wj20dg0aggmb.jpg" alt="caniuse"></p>
+<p>目前比较好的解决方案是采用 video.js 库，目前还在探索中。</p>
+<h2 id="Hybrid-开发和调试环境的问题"><a href="#Hybrid-开发和调试环境的问题" class="headerlink" title="Hybrid 开发和调试环境的问题"></a>Hybrid 开发和调试环境的问题</h2><p>Native 和 HTML5 通讯主要通过我们搭建的 JSBridge 框架，调用方式主要通过类似如下的回调：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JSBridge.call(action, params, callback);</span><br></pre></td></tr></table></figure>
+<p>上面 JSBridge 方式，HTML5 主动调用 Native 提供的接口，可以在 JSBridge 的基础上封装了一层 Promise 解决了回调地狱的问题，让接口调用的方式和前端使用 Fetch 请求网络接口的体验一样，将 Natvie 视为 Server。</p>
+<p>当然我们还有一些业务是需要 Native 主动通知 HTML5 从而更新相关视图。这里 JSBridge 行不通了，我们采用消息发送的机制，Web 端添加监听器，Native 端发送事件以及事件参数。目前业务不太复杂的情况下，处理各类事件还是比较容易控制，接口之间的耦合度也很低。</p>
+<p>在上述情况下，前端开发的体验和前后端分离的思想是类似的。</p>
+<p>接下来说说调试体验，我们的前端是工程化，开发使用的是 ES6 语法，通过编译器转译成 ES5 语法，并通过压缩工具和打包工具，将 CSS 和 JS 导出为单页面应用。这里造成的一个问题就是线上调试异常困难。<br>所以我们一般采用本地调试，主要通过本地开启静态服务，手机通过局域网访问该站点进行调试工作。这样在很多情况下，是没有太大问题的。</p>
+<p>但是由于 SlidePlus 是一款国际化的 App。需要挂载 VPN 模拟海外环境进行调试，这就不可能使用本地调试。目前还没有很好的解决方案，这也是遇到的一个坑。</p>
+<h2 id="Hybrid-的用户体验问题"><a href="#Hybrid-的用户体验问题" class="headerlink" title="Hybrid 的用户体验问题"></a>Hybrid 的用户体验问题</h2><p>用户体验问题是 Hybrid 无法避免的问题，我们能做到的就是无限地去接近原生的体验。</p>
+<p>请求页面的等待时间，这是最大的差异问题。<br>考虑在无网络和网络情况糟糕的情况下，不再请求服务器，而是使用本地预存好的静态页面。<br>为了保证网络访问情况在绝大部分情况下良好，国内采用阿里云的 CDN 加速，国外采用 Akamai CDN 加速。<br>为了减少请求流量，使用缓存和 ETag，基本优化方式和传统 Web 开发一致。<br>同时我们是单页面的概念，也就是说，第一次加载到网页后续的操作抛开请求接口的情况，基本都不需要请求网络，在一定程度上避免了频繁请求网络带来的延迟问题。<br>最后就是采用全站 https 方案解决运营商劫持的问题。（采用 https，在请求时会多了握手的链接，所以请求时间会略微变长）。还有一个 https 的坑，就是 Web 端请求 rpc 接口，收到的图片链接为 http 协议，这样会带来安全性问题，有些浏览器就会拒绝发出 http 请求，造成一些意外的问题。</p>
+<p>浏览器视图渲染的等待时间，我们需要做到尽量少的操作 DOM，在不可避免的情况下，可以考虑合并多次操作 DOM 的行为，一次性操作。对于频繁操作 DOM 的地方，我们需要将行为缓存起来。<br>遇到无限滚动列表滑动，在 Android 会出现整屏空白的情况，这里我采用的是使用 <strong>* requestAnimationFrame</strong>* 一个提供了一个统一帧管理、提供监听帧的 API。该接口的好处，对于一个侦中对DOM的所有操作，只进行一次Layout和Paint；如果发生动画的元素被隐藏了，那么就不再去Paint。</p>
+<p>在 Web 端，点击事件通常响应比原生慢很多，采用 fastclick 库可以非常好的避免这种问题。以及长按文本会弹出复制粘贴的菜单栏，这些我们都可以通过下面的 css 解决。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">-webkit-user-select</span>: <span class="selector-tag">none</span>;<span class="comment">/*禁用手机浏览器的用户选择功能 */</span></span><br><span class="line"><span class="selector-tag">-moz-user-select</span>: <span class="selector-tag">none</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="Hyrbid-的优缺点"><a href="#Hyrbid-的优缺点" class="headerlink" title="Hyrbid 的优缺点"></a>Hyrbid 的优缺点</h2><p>首先，至少在项目的初期，Hybrid 开发并没有 Native 开发那么快速，一堆无法预见的坑需要解决。</p>
+<p>然后接口调试较以往比较困难，遇到一些问题都是在摸索中爬行，很多时候一个问题需要在 Web 端和 Native 端两边都排查一遍才能找到。</p>
+<p>当然这些问题当 HTML5 容器逐渐成熟起来，把该爬到坑都爬过，后续 Native 端端开发会越来越轻松，一些业务代码可以迁移到 Web 端，在不发布新版本的情况下也可以很大自由地修改或增加一些需求，整个开发流程也会越来越灵活。</p>
+
+      
+    </div>
+
+    
+      
+      
+
+  <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="http://code.xnix.me">XueSeason</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="http://code.xnix.me/2016/09/12/关于-SlidePlus-Hybrid-开发的一些总结/">http://code.xnix.me/2016/09/12/关于-SlidePlus-Hybrid-开发的一些总结/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span>
+      
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/Hybrid/">Hybrid</a>
+            
+              <a href="/tags/SlidePlus/">SlidePlus</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2017/04/01/Docker-使用笔记/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">Docker 使用笔记</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    
+    
+      <a class="next" href="/2016/07/21/剖析-Promise-内部机制/">
+        <span class="next-text nav-default">剖析 Promise 内部机制</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:xueseason@icloud.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/xue_season" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/xueseason" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://instagram.com/xue_season" class="iconfont icon-instagram" title="instagram"></a>
+        
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2016 - 
+    
+    2018
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">XueSeason</span>
+  </span>
+</div>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+  
+
+  
+
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.6.0"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.6.0"></script>
+
+  </body>
+</html>

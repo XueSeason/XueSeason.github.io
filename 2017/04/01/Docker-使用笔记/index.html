@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+
+  <meta name="description" content="Docker 使用笔记"/>
+
+
+
+
+  <meta name="keywords" content="developer" />
+
+
+
+
+
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Code Craft">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.6.0" />
+
+
+
+<link rel="canonical" href="http://code.xnix.me/2017/04/01/Docker-使用笔记/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
+
+
+
+
+
+
+  
+  <script id="baidu_analytics">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e509e1f2c72a7907e19e99765a50b858";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.1.1/av-min.js"></script>
+  <script id="leancloud">
+    AV.init({
+      appId: "1KzfleDz7INCo32JTaHqqTNL-9Nh9j0Va",
+      appKey: "iB34bYSRr6XLtbwubkyvGGoH"
+    });
+  </script>
+
+
+
+
+
+    <title> Docker 使用笔记 - Code Craft </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">Code Craft</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            首页
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            归档
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Code Craft</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              首页
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              归档
+            
+          </a>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Docker 使用笔记
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-04-01
+        </span>
+        
+        
+        <div class="post-visits"
+             data-url="/2017/04/01/Docker-使用笔记/"
+             data-title="Docker 使用笔记">
+            阅读次数
+          </div>
+        
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#理解-image-和-container"><span class="toc-text">理解 image 和 container</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#寻找并运行-image"><span class="toc-text">寻找并运行 image</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#构建-image"><span class="toc-text">构建 image</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tag-push-pull-image"><span class="toc-text">Tag, push, pull image</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Tag"><span class="toc-text">Tag</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Push"><span class="toc-text">Push</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pull"><span class="toc-text">Pull</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#操作虚拟机"><span class="toc-text">操作虚拟机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建-swarm"><span class="toc-text">创建 swarm</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#初始化-swarm"><span class="toc-text">初始化 swarm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#将-worker-添加到-swarm-中"><span class="toc-text">将 worker 添加到 swarm 中</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#部署应用"><span class="toc-text">部署应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优雅地关闭，启动和清理应用"><span class="toc-text">优雅地关闭，启动和清理应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#暂停应用"><span class="toc-text">暂停应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重启应用"><span class="toc-text">重启应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#移除应用"><span class="toc-text">移除应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#移除虚拟机"><span class="toc-text">移除虚拟机</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#通过默认的网络启动-container"><span class="toc-text">通过默认的网络启动 container</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义桥接网络"><span class="toc-text">自定义桥接网络</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#将-container-添加到网络中"><span class="toc-text">将 container 添加到网络中</span></a></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <p>安装好 docker 后，输入命令<br><a id="more"></a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
+<p>查看正在运行的 container，更多选项查看 <code>docker ps --help</code></p>
+<h2 id="理解-image-和-container"><a href="#理解-image-和-container" class="headerlink" title="理解 image 和 container"></a>理解 image 和 container</h2><p>image 是静态的，由一个文件系统和一堆参数组成。当 image 被启动后，就被加载到 container。</p>
+<p>当输入命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run hello-world</span><br></pre></td></tr></table></figure>
+<p>Docker 会如下执行：</p>
+<ul>
+<li>检查本地是否存在 <code>hello-world</code> image</li>
+<li>从 Docker Hub 上下载 image （或者其他 hub）</li>
+<li>加载 image 到 container，并运行</li>
+</ul>
+<p>image 可能运行一个简单的命令然后退出，但也可以启动像数据库这般复杂的程序。使用 Docker，你完全不需要关心运行环境，container 会帮你解决这些问题。</p>
+<h2 id="寻找并运行-image"><a href="#寻找并运行-image" class="headerlink" title="寻找并运行 image"></a>寻找并运行 image</h2><p>Docker 让我们可以创建并且分享 image。就像使用 GitHub 一样，你可以浏览 <a href="https://store.docker.com/community/images/docker/whalesay" target="_blank" rel="noopener">Docker Hub</a> 找到各种你想要的 image。</p>
+<p>类似于上文的 hello world 事例，输入命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run docker/whalesay cowsay boo</span><br></pre></td></tr></table></figure>
+<p>此时你就运行了一个 whalesay image，执行过程和 hello world 一样，只不过多了一些参数而已。</p>
+<p>当你在 container 中运行 image，Docker 会先将 image 下载到本地，以后再执行此命令，会优先从本地读取。只有hub 上的 image 的发生改变，Docker 才会重新下载。</p>
+<p>如果要查看本地已有的所有 image，输入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
+<h2 id="构建-image"><a href="#构建-image" class="headerlink" title="构建 image"></a>构建 image</h2><p>首先要知道 <code>Dockerfile</code> 的概念，类似于 node 的 <code>package.json</code>，<code>Dockerfile</code> 是一个构建 image 的描述文件。</p>
+<p>在项目目录下，创建一个 <code>Dockerfile</code> 文件</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># FROM 关键字代表基于指定 image 改进，这里我们需要使用 whalesay image 的 cowsay 程序</span></span><br><span class="line"><span class="keyword">FROM</span> docker/whalesay:latest</span><br><span class="line"><span class="comment"># whalesay image 是基于 Ubuntu，所以我们使用 apt-get 来安装包，fortunes 程序会随机输出名人格言</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get -y update &amp;&amp; apt-get install -y fortunes</span></span><br><span class="line"><span class="bash"><span class="comment"># CMD 命令会在环境设置完毕后执行</span></span></span><br><span class="line"><span class="bash">CMD /usr/games/fortune -a | cowsay</span></span><br></pre></td></tr></table></figure>
+<p>执行命令构建 image</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t docker-whale-test .</span><br></pre></td></tr></table></figure>
+<p>-t 参数会给 image 打个标记，方便以后运行。不要忘记 <code>.</code> ，表示从当前目录寻找 <code>Dockerfile</code> 文件。</p>
+<p>此时你就可以运行构建好的 image</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run docker-whale-test</span><br></pre></td></tr></table></figure>
+<p>每次执行都会随机输出一条名言。</p>
+<h2 id="Tag-push-pull-image"><a href="#Tag-push-pull-image" class="headerlink" title="Tag, push, pull image"></a>Tag, push, pull image</h2><h3 id="Tag"><a href="#Tag" class="headerlink" title="Tag"></a>Tag</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
+<p>可以看到 docker-whale-test 的 id</p>
+<p>确保你有 Docker Hub 的账号，运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker tag <span class="variable">$&#123;image id&#125;</span> <span class="variable">$&#123;hub accountname&#125;</span>/docker-whale-test:latest</span><br></pre></td></tr></table></figure>
+<p>再次执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
+<p>确保 docker-whale-test 已经被打上标签。</p>
+<h3 id="Push"><a href="#Push" class="headerlink" title="Push"></a>Push</h3><p>在 push image 到 Docker Hub 之前，你需要登录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker login</span><br></pre></td></tr></table></figure>
+<p>在 Docker Hub 站点上创建一个同名仓库，然后执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker push <span class="variable">$&#123;hub accountname&#125;</span>/docker-whale-test</span><br></pre></td></tr></table></figure>
+<p>上传成功后，就可以到仓库首页查看具体信息了。</p>
+<h3 id="Pull"><a href="#Pull" class="headerlink" title="Pull"></a>Pull</h3><p>上传到 Docker Hub 后，你可以在任何地方通过 <code>docker pull</code> 获取 image。</p>
+<p>首先你要删除本地的备份，否则 <code>docker pull</code> 会认为本地存在指定 image 而不去 Docker Hub 上获取 image。</p>
+<p>通过以下命令删除本地指定 id 的 image</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi -f <span class="variable">$&#123;image id&#125;</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>docker image rm -f</code> 命令可以批量删除</p>
+<p>最后执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run <span class="variable">$&#123;hub accountname&#125;</span>/docker-whale-test</span><br></pre></td></tr></table></figure>
+<p>就会自动下载并运行 image</p>
+<h2 id="操作虚拟机"><a href="#操作虚拟机" class="headerlink" title="操作虚拟机"></a>操作虚拟机</h2><p>创建一个本地的虚拟机</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine create --driver virtualbox <span class="variable">$&#123;MACHINE-NAME&#125;</span></span><br></pre></td></tr></table></figure>
+<p>查看创建完的虚拟机的环境</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine env <span class="variable">$&#123;MACHINE-NAME&#125;</span></span><br></pre></td></tr></table></figure>
+<p>创建完的虚拟机列表</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ls</span><br></pre></td></tr></table></figure>
+<p>通过 ssh 访问创建好的虚拟机</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ssh <span class="variable">$&#123;MACHINE-NAME&#125;</span></span><br></pre></td></tr></table></figure>
+<h2 id="创建-swarm"><a href="#创建-swarm" class="headerlink" title="创建 swarm"></a>创建 swarm</h2><h3 id="初始化-swarm"><a href="#初始化-swarm" class="headerlink" title="初始化 swarm"></a>初始化 swarm</h3><p>ssh 登录到 manager 虚拟机，执行初始化 swarm 命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker swarm init --advertise-add <span class="variable">$&#123;MANAGER-IP&#125;</span></span><br></pre></td></tr></table></figure>
+<h3 id="将-worker-添加到-swarm-中"><a href="#将-worker-添加到-swarm-中" class="headerlink" title="将 worker 添加到 swarm 中"></a>将 worker 添加到 swarm 中</h3><p>在上一步初始化完成后，会输出一个 <code>join</code> 命令。登录到 worker 虚拟机中执行这个命令，命令形式如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker swarm join \</span><br><span class="line">--token SWMTKN-1-3msallxxbth84sgdvqblncb5915uxwsjv2pc1tsbs3vbv74oms-5xc8gf0cr3731mto8mjltt75x \</span><br><span class="line">192.168.99.100:2377</span><br></pre></td></tr></table></figure>
+<p>你也可以在 manager 虚拟机中执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker swarm join-token worker</span><br></pre></td></tr></table></figure>
+<p>来重新获取 <code>join</code> 命令。</p>
+<p>在 manager 虚拟机中执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker node ls</span><br></pre></td></tr></table></figure>
+<p>可以查看当前 swarm 中的节点。</p>
+<h2 id="部署应用"><a href="#部署应用" class="headerlink" title="部署应用"></a>部署应用</h2><p>创建一个 <code>docker-stack.yml</code> 文件，并复制到 manager 虚拟机中</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine scp docker-stack.yml manager:/home/docker/</span><br></pre></td></tr></table></figure>
+<p>进入 manager 虚拟机中执行（之后修改 yml 文件，你也可以执行相同的命令进行重新部署）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack deploy --compose-file docker-stack.yml <span class="variable">$&#123;APP-NAME&#125;</span></span><br></pre></td></tr></table></figure>
+<p>耐心等待创建完毕后，可以通过如下命令确认 stack 是否如期部署</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack services  <span class="variable">$&#123;APP-NAME&#125;</span></span><br></pre></td></tr></table></figure>
+<h2 id="优雅地关闭，启动和清理应用"><a href="#优雅地关闭，启动和清理应用" class="headerlink" title="优雅地关闭，启动和清理应用"></a>优雅地关闭，启动和清理应用</h2><h3 id="暂停应用"><a href="#暂停应用" class="headerlink" title="暂停应用"></a>暂停应用</h3><p>从 worker 开始使用 <code>docker-machine stop</code> 命令来关闭虚拟机</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker-machine stop worker</span><br><span class="line">docker-machine stop manager</span><br></pre></td></tr></table></figure>
+<h3 id="重启应用"><a href="#重启应用" class="headerlink" title="重启应用"></a>重启应用</h3><p>从 manager 开始使用 <code>docker-machine start</code> 命令来启动虚拟机</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker-machine start manager</span><br><span class="line">docker-machine start worker</span><br></pre></td></tr></table></figure>
+<h3 id="移除应用"><a href="#移除应用" class="headerlink" title="移除应用"></a>移除应用</h3><p>登录 manager 虚拟机，执行命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack rm <span class="variable">$&#123;APP-NAME&#125;</span></span><br></pre></td></tr></table></figure>
+<p>来删除应用以及 manager 和 worker 上相关的所有服务</p>
+<p>通过 <code>docker stack ps ${APP-NAME}</code> 或者 <code>docker stack services ${APP-NAME}</code> 命令确定服务是否全部移除。</p>
+<h3 id="移除虚拟机"><a href="#移除虚拟机" class="headerlink" title="移除虚拟机"></a>移除虚拟机</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker-machine rm -f worker</span><br><span class="line">docker-machine rm -f manager</span><br></pre></td></tr></table></figure>
+<h2 id="通过默认的网络启动-container"><a href="#通过默认的网络启动-container" class="headerlink" title="通过默认的网络启动 container"></a>通过默认的网络启动 container</h2><p>安装完 Docker 后，自动会包含 3 个默认的网络，可以通过以下命令查看</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker network ls</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">NETWORK ID          NAME                DRIVER              SCOPE</span><br><span class="line">66ed589ff017        bridge              bridge              <span class="built_in">local</span></span><br><span class="line">5f904357860e        host                host                <span class="built_in">local</span></span><br><span class="line">e5e8d423a72e        none                null                <span class="built_in">local</span></span><br></pre></td></tr></table></figure>
+<p><code>bridge</code> 是一个特殊的网络，没有额外的设置，Docker 会默认让 container 使用该网络。</p>
+<p>我们启动一个 ubtuntu image，起一个额外的名字 <code>networktest</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -itd --name=networktest ubuntu</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">e05f4816b60b6e7e7841cef23905fc63d9e2a29f5755b25dac10dc0440a17e5d</span><br></pre></td></tr></table></figure>
+<p>找到容器 IP 地址的一个简单方式就是通过网络监测命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker network inspect bridge</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"Name"</span>: <span class="string">"bridge"</span>,</span><br><span class="line">        <span class="attr">"Id"</span>: <span class="string">"66ed589ff0170b57ad6fab27cf55d9355a70dad78bf0da9c14f05ec08941635c"</span>,</span><br><span class="line">        <span class="attr">"Created"</span>: <span class="string">"2017-04-01T01:23:09.546974394Z"</span>,</span><br><span class="line">        <span class="attr">"Scope"</span>: <span class="string">"local"</span>,</span><br><span class="line">        <span class="attr">"Driver"</span>: <span class="string">"bridge"</span>,</span><br><span class="line">        <span class="attr">"EnableIPv6"</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">"IPAM"</span>: &#123;</span><br><span class="line">            <span class="attr">"Driver"</span>: <span class="string">"default"</span>,</span><br><span class="line">            <span class="attr">"Options"</span>: <span class="literal">null</span>,</span><br><span class="line">            <span class="attr">"Config"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"Subnet"</span>: <span class="string">"172.17.0.0/16"</span>,</span><br><span class="line">                    <span class="attr">"Gateway"</span>: <span class="string">"172.17.0.1"</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"Internal"</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">"Attachable"</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">"Containers"</span>: &#123;</span><br><span class="line">            <span class="attr">"e05f4816b60b6e7e7841cef23905fc63d9e2a29f5755b25dac10dc0440a17e5d"</span>: &#123;</span><br><span class="line">                <span class="attr">"Name"</span>: <span class="string">"networktest"</span>,</span><br><span class="line">                <span class="attr">"EndpointID"</span>: <span class="string">"9f6bea72c3aca88aa11de0f98068f07fe5ca12d7f254c245745a6b1b09997ab8"</span>,</span><br><span class="line">                <span class="attr">"MacAddress"</span>: <span class="string">"02:42:ac:11:00:02"</span>,</span><br><span class="line">                <span class="attr">"IPv4Address"</span>: <span class="string">"172.17.0.2/16"</span>,</span><br><span class="line">                <span class="attr">"IPv6Address"</span>: <span class="string">""</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"Options"</span>: &#123;</span><br><span class="line">            <span class="attr">"com.docker.network.bridge.default_bridge"</span>: <span class="string">"true"</span>,</span><br><span class="line">            <span class="attr">"com.docker.network.bridge.enable_icc"</span>: <span class="string">"true"</span>,</span><br><span class="line">            <span class="attr">"com.docker.network.bridge.enable_ip_masquerade"</span>: <span class="string">"true"</span>,</span><br><span class="line">            <span class="attr">"com.docker.network.bridge.host_binding_ipv4"</span>: <span class="string">"0.0.0.0"</span>,</span><br><span class="line">            <span class="attr">"com.docker.network.bridge.name"</span>: <span class="string">"docker0"</span>,</span><br><span class="line">            <span class="attr">"com.docker.network.driver.mtu"</span>: <span class="string">"1500"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"Labels"</span>: &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>用以下命令从网络中来移除一个 container</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker network disconnect <span class="variable">$&#123;NETWORK-NAME&#125;</span> <span class="variable">$&#123;CONTAINER-ID | CONTAINER-NAME&#125;</span></span><br></pre></td></tr></table></figure>
+<p>如 <code>docker network disconnect bridge networktest</code></p>
+<h2 id="自定义桥接网络"><a href="#自定义桥接网络" class="headerlink" title="自定义桥接网络"></a>自定义桥接网络</h2><p>Docker 原生支持桥接网络（bridge network）和覆盖网络（overlay network）。覆盖网络是更高级的主题，暂时不管。</p>
+<p>创建一个桥接网络</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker network create -d bridge my-bridge-network</span><br></pre></td></tr></table></figure>
+<p>-d 表示使用 bridge 驱动来创建新的网络。现在用命令 <code>docker netwrok ls</code> 查看下当前所有的网络</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">NETWORK ID          NAME                DRIVER              SCOPE</span><br><span class="line">66ed589ff017        bridge              bridge              <span class="built_in">local</span></span><br><span class="line">5f904357860e        host                host                <span class="built_in">local</span></span><br><span class="line">11de3b834b42        my-bridge-network   bridge              <span class="built_in">local</span></span><br><span class="line">e5e8d423a72e        none                null                <span class="built_in">local</span></span><br></pre></td></tr></table></figure>
+<p>如果使用 <code>docker network inspect my-bridge-network</code> 命令，很多信息都是空的。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"Name"</span>: <span class="string">"my-bridge-network"</span>,</span><br><span class="line">        <span class="attr">"Id"</span>: <span class="string">"11de3b834b421ef9bc411867cf67b6f78207f7cdfa12ee83d23cd7c2b0e0ba89"</span>,</span><br><span class="line">        <span class="attr">"Created"</span>: <span class="string">"2017-04-05T02:08:27.299036035Z"</span>,</span><br><span class="line">        <span class="attr">"Scope"</span>: <span class="string">"local"</span>,</span><br><span class="line">        <span class="attr">"Driver"</span>: <span class="string">"bridge"</span>,</span><br><span class="line">        <span class="attr">"EnableIPv6"</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">"IPAM"</span>: &#123;</span><br><span class="line">            <span class="attr">"Driver"</span>: <span class="string">"default"</span>,</span><br><span class="line">            <span class="attr">"Options"</span>: &#123;&#125;,</span><br><span class="line">            <span class="attr">"Config"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"Subnet"</span>: <span class="string">"172.18.0.0/16"</span>,</span><br><span class="line">                    <span class="attr">"Gateway"</span>: <span class="string">"172.18.0.1"</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"Internal"</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">"Attachable"</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">"Containers"</span>: &#123;&#125;,</span><br><span class="line">        <span class="attr">"Options"</span>: &#123;&#125;,</span><br><span class="line">        <span class="attr">"Labels"</span>: &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<h2 id="将-container-添加到网络中"><a href="#将-container-添加到网络中" class="headerlink" title="将 container 添加到网络中"></a>将 container 添加到网络中</h2><p>container 可以在各自完全独立的网络中运行。</p>
+<p>启动一个运行 PostgreSQL 数据库的 container，并连接到新的网络中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --net=my-bridge-network --name db training/postgres</span><br></pre></td></tr></table></figure>
+<p>你可以使用 <code>docker network inspect</code> 命令来检测 container 是否加入到网络中。你也可以检测 container 被加入到哪个网络中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect --format=<span class="string">'&#123;&#123;json .NetworkSettings.Networks&#125;&#125;'</span> db</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"my-bridge-network"</span>:&#123;<span class="attr">"IPAMConfig"</span>:<span class="literal">null</span>,<span class="attr">"Links"</span>:<span class="literal">null</span>,<span class="attr">"Aliases"</span>:[<span class="string">"69527e528e38"</span>],<span class="attr">"NetworkID"</span>:<span class="string">"11de3b834b421ef9bc411867cf67b6f78207f7cdfa12ee83d23cd7c2b0e0ba89"</span>,<span class="attr">"EndpointID"</span>:<span class="string">"46d4c9d3f3d84ae9a08dee0a4aea52b42846f684a438e64d6801ea5d2dad51e9"</span>,<span class="attr">"Gateway"</span>:<span class="string">"172.18.0.1"</span>,<span class="attr">"IPAddress"</span>:<span class="string">"172.18.0.2"</span>,<span class="attr">"IPPrefixLen"</span>:<span class="number">16</span>,<span class="attr">"IPv6Gateway"</span>:<span class="string">""</span>,<span class="attr">"GlobalIPv6Address"</span>:<span class="string">""</span>,<span class="attr">"GlobalIPv6PrefixLen"</span>:<span class="number">0</span>,<span class="attr">"MacAddress"</span>:<span class="string">"02:42:ac:12:00:02"</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>我们继续启动一个 web 应用，这次不特别指定某个网络</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name web training/webapp python app.py</span><br></pre></td></tr></table></figure>
+<p>检测到使用的是默认的 bridge 网络</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect --format=<span class="string">'&#123;&#123;json .NetworkSettings.Networks&#125;&#125;'</span> web</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"bridge"</span>:&#123;<span class="attr">"IPAMConfig"</span>:<span class="literal">null</span>,<span class="attr">"Links"</span>:<span class="literal">null</span>,<span class="attr">"Aliases"</span>:<span class="literal">null</span>,<span class="attr">"NetworkID"</span>:<span class="string">"66ed589ff0170b57ad6fab27cf55d9355a70dad78bf0da9c14f05ec08941635c"</span>,<span class="attr">"EndpointID"</span>:<span class="string">"16de6cdfdd408b73a82cb222c3d380c71d6d201d3940ab4b2fc0391b33e4bb2d"</span>,<span class="attr">"Gateway"</span>:<span class="string">"172.17.0.1"</span>,<span class="attr">"IPAddress"</span>:<span class="string">"172.17.0.2"</span>,<span class="attr">"IPPrefixLen"</span>:<span class="number">16</span>,<span class="attr">"IPv6Gateway"</span>:<span class="string">""</span>,<span class="attr">"GlobalIPv6Address"</span>:<span class="string">""</span>,<span class="attr">"GlobalIPv6PrefixLen"</span>:<span class="number">0</span>,<span class="attr">"MacAddress"</span>:<span class="string">"02:42:ac:11:00:02"</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>获取 web 的 IP 地址</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect --format=<span class="string">'&#123;&#123;range .NetworkSettings.Networks&#125;&#125;&#123;&#123;.IPAddress&#125;&#125;&#123;&#123;end&#125;&#125;'</span> web</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">172.17.0.2</span><br></pre></td></tr></table></figure>
+<p>使用 <code>docker exec</code> 来在指定的 container 中运行命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it db bash</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">root@69527e528e38:/<span class="comment"># ping 172.17.0.2</span></span><br><span class="line">PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.</span><br><span class="line">^C</span><br><span class="line">--- 172.17.0.2 ping statistics ---</span><br><span class="line">9 packets transmitted, 0 received, 100% packet loss, time 8286ms</span><br><span class="line"></span><br><span class="line">root@69527e528e38:/<span class="comment"># exit</span></span><br></pre></td></tr></table></figure>
+<p>因为两个 container 运行在不同的网络中，所以是 ping 不通的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker network connect my-bridge-network web</span><br></pre></td></tr></table></figure>
+<p>重新进入 db 执行 ping 命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ docker <span class="built_in">exec</span> -it db bash</span><br><span class="line">root@69527e528e38:/<span class="comment"># ping 172.18.0.3</span></span><br><span class="line">PING 172.18.0.3 (172.18.0.3) 56(84) bytes of data.</span><br><span class="line">64 bytes from 172.18.0.3: icmp_seq=1 ttl=64 time=0.159 ms</span><br><span class="line">64 bytes from 172.18.0.3: icmp_seq=2 ttl=64 time=0.110 ms</span><br><span class="line">64 bytes from 172.18.0.3: icmp_seq=3 ttl=64 time=0.109 ms</span><br><span class="line">64 bytes from 172.18.0.3: icmp_seq=4 ttl=64 time=0.109 ms</span><br><span class="line">^C</span><br><span class="line">--- 172.18.0.3 ping statistics ---</span><br><span class="line">4 packets transmitted, 4 received, 0% packet loss, time 3127ms</span><br><span class="line">rtt min/avg/max/mdev = 0.109/0.121/0.159/0.025 ms</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+      
+      
+
+  <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="http://code.xnix.me">XueSeason</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="http://code.xnix.me/2017/04/01/Docker-使用笔记/">http://code.xnix.me/2017/04/01/Docker-使用笔记/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span>
+      
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/docker/">docker</a>
+            
+              <a href="/tags/note/">note</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2017/11/08/重读-Redux-源码/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">重读 Redux 源码</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    
+    
+      <a class="next" href="/2016/09/12/关于-SlidePlus-Hybrid-开发的一些总结/">
+        <span class="next-text nav-default">关于 SlidePlus Hybrid 开发的一些总结</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:xueseason@icloud.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/xue_season" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/xueseason" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://instagram.com/xue_season" class="iconfont icon-instagram" title="instagram"></a>
+        
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2016 - 
+    
+    2018
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">XueSeason</span>
+  </span>
+</div>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+  
+
+  
+
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.6.0"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.6.0"></script>
+
+  </body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+
+  <meta name="description" content="重读 Redux 源码"/>
+
+
+
+
+  <meta name="keywords" content="developer" />
+
+
+
+
+
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Code Craft">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.6.0" />
+
+
+
+<link rel="canonical" href="http://code.xnix.me/2017/11/08/重读-Redux-源码/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
+
+
+
+
+
+
+  
+  <script id="baidu_analytics">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e509e1f2c72a7907e19e99765a50b858";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.1.1/av-min.js"></script>
+  <script id="leancloud">
+    AV.init({
+      appId: "1KzfleDz7INCo32JTaHqqTNL-9Nh9j0Va",
+      appKey: "iB34bYSRr6XLtbwubkyvGGoH"
+    });
+  </script>
+
+
+
+
+
+    <title> 重读 Redux 源码 - Code Craft </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">Code Craft</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            首页
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            归档
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Code Craft</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              首页
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              归档
+            
+          </a>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          重读 Redux 源码
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-11-08
+        </span>
+        
+        
+        <div class="post-visits"
+             data-url="/2017/11/08/重读-Redux-源码/"
+             data-title="重读 Redux 源码">
+            阅读次数
+          </div>
+        
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#createStore"><span class="toc-text">createStore</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#combineReducers"><span class="toc-text">combineReducers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bindActionCreator"><span class="toc-text">bindActionCreator</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#compose"><span class="toc-text">compose</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#applyMiddleware"><span class="toc-text">applyMiddleware</span></a></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <h2 id="createStore"><a href="#createStore" class="headerlink" title="createStore"></a>createStore</h2><a id="more"></a>
+<p>私有变量</p>
+<ul>
+<li>currentReducer 当前的 reducer，用于生成状态树</li>
+<li>currentState 当前状态树</li>
+<li>currentListeners 当前的监听器方法数组</li>
+<li>nextListeners 下一个待执行的监听器方法数组</li>
+<li>isDispatching 在 dispatch 方法中，currentReducer 执行前后的状态。</li>
+</ul>
+<p>私有方法</p>
+<p><code>ensureCanMutateNextListeners</code> 如果在监听器中调用了 dispatch，因为 dispatch 方法也会注意触发之前传入的监听器，为了在新的监听器被加入之前确保当前的监听器数组能够正常被调用，需要拷贝一份监听器。</p>
+<p>共有方法</p>
+<ul>
+<li>getState 获取当前状态树。</li>
+<li>subscribe 通过订阅来监听状态的变化，返回一个 unsubscribe 方法来取消监听。这里添加监听器之前会调用 ensureCanMutateNextListeners 方法。unsubscribe 在移除监听器前也会有同样的拷贝操作。</li>
+<li>dispatch 发送 Action，来改变状态树，然后逐一调用 subscribe 传入的监听器方法。</li>
+<li>replaceReducer 通过替换 reducer 从而生成新的状态树。通常在代码分隔和热加载机制中使用。</li>
+<li>observable 为 observable/reactive 考虑的方法，这里不继续深入。</li>
+</ul>
+<h2 id="combineReducers"><a href="#combineReducers" class="headerlink" title="combineReducers"></a>combineReducers</h2><p>合并多个子 reducer 返回一个总 reducer，通过这个返回的 reducer 方法可以得到 state 树。</p>
+<p>核心代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> hasChanged = <span class="literal">false</span></span><br><span class="line"><span class="keyword">const</span> nextState = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; finalReducerKeys.length; i++) &#123;</span><br><span class="line">  <span class="keyword">const</span> key = finalReducerKeys[i]</span><br><span class="line">  <span class="keyword">const</span> reducer = finalReducers[key]</span><br><span class="line">  <span class="keyword">const</span> previousStateForKey = state[key]</span><br><span class="line">  <span class="keyword">const</span> nextStateForKey = reducer(previousStateForKey, action)</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  nextState[key] = nextStateForKey</span><br><span class="line">  hasChanged = hasChanged || nextStateForKey !== previousStateForKey</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> hasChanged ? nextState : state</span><br></pre></td></tr></table></figure>
+<h2 id="bindActionCreator"><a href="#bindActionCreator" class="headerlink" title="bindActionCreator"></a>bindActionCreator</h2><p>一个便捷方法，返回 Action Creator 方法封装 dispatch 后的对象，后续便可直接调用对象里的方法。一般使用场景，把 Action Creator 下传到子组件上，使子组件无法感知 Redux 的存在。</p>
+<h2 id="compose"><a href="#compose" class="headerlink" title="compose"></a>compose</h2><p>联合函数，将多个函数组装成管道传输值。compose(f, g, h) 将会转化为 (…args) =&gt; f(g(h(…args)))。</p>
+<h2 id="applyMiddleware"><a href="#applyMiddleware" class="headerlink" title="applyMiddleware"></a>applyMiddleware</h2><p>代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">applyMiddleware</span>(<span class="params">...middlewares</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">createStore</span>) =&gt;</span> (...args) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> store = createStore(...args)</span><br><span class="line">    <span class="keyword">let</span> dispatch = store.dispatch</span><br><span class="line">    <span class="keyword">let</span> chain = []</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> middlewareAPI = &#123;</span><br><span class="line">      getState: store.getState,</span><br><span class="line">      dispatch: <span class="function">(<span class="params">...args</span>) =&gt;</span> dispatch(...args)</span><br><span class="line">    &#125;</span><br><span class="line">    chain = middlewares.map(<span class="function"><span class="params">middleware</span> =&gt;</span> middleware(middlewareAPI))</span><br><span class="line">    dispatch = compose(...chain)(store.dispatch)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      ...store,</span><br><span class="line">      dispatch</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>dispatch: (...args) =&gt; dispatch(...args)</code> 这段代码对 dispatch 用匿名函数包裹，因为后续 dispatch 会发生更新，使用闭包的好处在于匿名函数内部的 dispatch 会随之更新。</p>
+<p><code>dispatch = compose(...chain)(store.dispatch)</code> 这段代码是最核心。假设 chain 数组为 [f, g, h]，最终会转化为 f(g(h(store.dispatch)))，从右到左执行返回一个新的 dispatch，形成从左向右顺序的调用链。</p>
+<p>中间件格式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> [middleware name] = <span class="function"><span class="params">store</span> =&gt;</span> next =&gt; <span class="function"><span class="params">action</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// before</span></span><br><span class="line">  next(action)</span><br><span class="line">  <span class="comment">// after</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>类似于链表，最后的 next 指向 store.dispatch，一个 action 的触发，先经过 middlewares 然后再调用 store.dispatch 改变 state。</p>
+
+      
+    </div>
+
+    
+      
+      
+
+  <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="http://code.xnix.me">XueSeason</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="http://code.xnix.me/2017/11/08/重读-Redux-源码/">http://code.xnix.me/2017/11/08/重读-Redux-源码/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span>
+      
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/源码/">源码</a>
+            
+              <a href="/tags/Redux/">Redux</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2017/11/09/React-文档笔记/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">React 文档笔记</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    
+    
+      <a class="next" href="/2017/04/01/Docker-使用笔记/">
+        <span class="next-text nav-default">Docker 使用笔记</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:xueseason@icloud.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/xue_season" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/xueseason" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://instagram.com/xue_season" class="iconfont icon-instagram" title="instagram"></a>
+        
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2016 - 
+    
+    2018
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">XueSeason</span>
+  </span>
+</div>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+  
+
+  
+
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.6.0"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.6.0"></script>
+
+  </body>
+</html>

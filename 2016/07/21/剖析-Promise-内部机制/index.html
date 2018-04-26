@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+
+  <meta name="description" content="剖析 Promise 内部机制"/>
+
+
+
+
+  <meta name="keywords" content="developer" />
+
+
+
+
+
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Code Craft">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.6.0" />
+
+
+
+<link rel="canonical" href="http://code.xnix.me/2016/07/21/剖析-Promise-内部机制/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
+
+
+
+
+
+
+  
+  <script id="baidu_analytics">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e509e1f2c72a7907e19e99765a50b858";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.1.1/av-min.js"></script>
+  <script id="leancloud">
+    AV.init({
+      appId: "1KzfleDz7INCo32JTaHqqTNL-9Nh9j0Va",
+      appKey: "iB34bYSRr6XLtbwubkyvGGoH"
+    });
+  </script>
+
+
+
+
+
+    <title> 剖析 Promise 内部机制 - Code Craft </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">Code Craft</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            首页
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            归档
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Code Craft</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              首页
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              归档
+            
+          </a>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          剖析 Promise 内部机制
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2016-07-21
+        </span>
+        
+        
+        <div class="post-visits"
+             data-url="/2016/07/21/剖析-Promise-内部机制/"
+             data-title="剖析 Promise 内部机制">
+            阅读次数
+          </div>
+        
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#从回调地狱说起-Callback-Hell"><span class="toc-text">从回调地狱说起 Callback Hell</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#救世主-Promise"><span class="toc-text">救世主 Promise</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一步步打造心中的-Promise"><span class="toc-text">一步步打造心中的 Promise</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基础实现"><span class="toc-text">基础实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#异步"><span class="toc-text">异步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#引入状态"><span class="toc-text">引入状态</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#串行-Promise"><span class="toc-text">串行 Promise</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Promise-具体流程"><span class="toc-text">Promise 具体流程</span></a></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <h2 id="从回调地狱说起-Callback-Hell"><a href="#从回调地狱说起-Callback-Hell" class="headerlink" title="从回调地狱说起 Callback Hell"></a>从回调地狱说起 Callback Hell</h2><a id="more"></a>
+<p>在 Node 中，绝大部分操作都是异步的方式，例如读取一个文件内容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fs.readFile(<span class="string">'./config/pass.txt'</span>, (err, data) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (err) <span class="keyword">throw</span> err</span><br><span class="line">  <span class="built_in">console</span>.log(data)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>这里我们通过传入一个回调函数作为异步完成的后续操作。</p>
+<p>如果我们异步读取多个文件，等到所有文件读取完毕执行特定操作呢？<br>代码修改如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">fs.readFile(<span class="string">'./config/pass.txt'</span>, (err, data) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (err) <span class="keyword">throw</span> err</span><br><span class="line">  fs.readFile(<span class="string">'./config/pass1.txt'</span>, (err, data1) =&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (err) <span class="keyword">throw</span> err</span><br><span class="line">    fs.readFile(<span class="string">'./config/pass2.txt'</span>, (err, data2) =&gt; &#123;</span><br><span class="line">      <span class="keyword">if</span> (err) <span class="keyword">throw</span> err</span><br><span class="line">      fs.readFile(<span class="string">'./config/pass3.txt'</span>, (err, data3) =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (err) <span class="keyword">throw</span> err</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'success'</span>);</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>这里还是简单地敲套三层，想象下业务突然复杂，一不小心嵌套五层以上，这画面太美。。。</p>
+<h2 id="救世主-Promise"><a href="#救世主-Promise" class="headerlink" title="救世主 Promise"></a>救世主 Promise</h2><blockquote>
+<p>Promise 的音译是普罗米修斯，是希腊神话故事中的英雄，名字的意思是“先知”。</p>
+</blockquote>
+<p>我们可以把上面 Node 读取文件的操作改造如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">asyncReadFile</span> (<span class="params">filePath, options</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    fs.readFile(filePath, options, (err, data) =&gt; &#123;</span><br><span class="line">      <span class="keyword">if</span> (err) reject(err)</span><br><span class="line">      resolve(data)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在来看看 Promise 是如何解决 Callback Hell 的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">asyncReadFile(<span class="string">'./config/pass.text'</span>).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> asyncReadFile(<span class="string">'./config/pass1.text'</span>)</span><br><span class="line">&#125;).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> asyncReadFile(<span class="string">'./config/pass2.text'</span>)</span><br><span class="line">&#125;).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> asyncReadFile(<span class="string">'./config/pass3.text'</span>)</span><br><span class="line">&#125;).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'success'</span>)</span><br><span class="line">&#125;).catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(err)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>对于先知的我们，故事的安排在脑中是即时出现的，而非实际上的异步发生。因此，作为创世的编程者而言，这种与瞬间思考所同步的代码更符合现实世界下的思考方式。因此，更易读更易于理解。</p>
+</blockquote>
+<p>Promise 是一种对异步操作的封装，在异步操作执行成功或者失败时执行指定方法。将横向的异步调用转换为纵向，因此更符合人类的思维方式。</p>
+<p>一个 Promise 对象具备三种生命状态：pending、fulfilled 和 rejected。只能从最初的 pending 到 fulfilled 或者 rejected，而且状态的改变是不可逆的。</p>
+<p><img src="http://ww3.sinaimg.cn/large/aa0fbcc4gw1f61u9ne8d1j208u04umxc.jpg" alt="pending"></p>
+<p>我们先简单看下 Promise 的工作原理。</p>
+<p><img src="http://ww4.sinaimg.cn/large/aa0fbcc4gw1f61u4fuaf0j20jc07b74z.jpg" alt="promise"></p>
+<p>Promise 大致的工作流程是：</p>
+<ul>
+<li>创建 Promise 对象 =&gt; 进入等待处理阶段 Pending</li>
+<li>处理完成后，切换到 Fulfilled 状态／ Rejected 状态</li>
+<li>根据状态，执行 then 方法／执行 catch 方法 内的回调函数</li>
+<li>then 方法返回新的 Promise，此时就支持链式调用</li>
+</ul>
+<p>这里创建一个 Promise 对象，Promise 内部维系着 resolve 和 reject 方法，resolve 会让 Promise 对象进入 Fulfilled 状态，并将 resolve 方法的第一个参数传给后续 then 所指定的 onFulfilled 函数。reject 方法同理，只不过是切换到 Rejected 状态，并将参数传给 catch 所指定的 onRejected 函数。</p>
+<h2 id="一步步打造心中的-Promise"><a href="#一步步打造心中的-Promise" class="headerlink" title="一步步打造心中的 Promise"></a>一步步打造心中的 Promise</h2><h3 id="基础实现"><a href="#基础实现" class="headerlink" title="基础实现"></a>基础实现</h3><p>先抛开 rejected，实现一个 Promise 的调用链的简单代码如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Promise</span> (<span class="params">fn</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> deferreds = []</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.then = <span class="function"><span class="keyword">function</span> (<span class="params">onFulfilled</span>) </span>&#123;</span><br><span class="line">    deferreds.push(onFulfilled)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">resolve</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    deferreds.forEach(<span class="function"><span class="params">deferred</span> =&gt;</span> &#123;</span><br><span class="line">      deferred(value)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  fn(resolve)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>深入理解上面代码逻辑：</p>
+<ul>
+<li>then 方法将 onFulfilled 函数压入 deferreds 队列中。</li>
+<li>将 resolve 传给创建 Promise 时传入的函数，resolve 的作用是将 deferreds 中的 onFulfilled 函数队列逐一执行。</li>
+</ul>
+<p>但是这段代码暴露出一个严重的问题，如果 Promise 执行的是同步代码，resolve 是早于 then 方法的执行，这样造成一个问题：<strong>then 还没有及时把 onFulfilled 函数压入队列，此时 deferreds 还是空数组，resolve 执行后，后续注册到 deferreds 数组内的 onFulfilled 函数将不再执行。</strong></p>
+<p>这里我们可以把 deferreds 数组视为水桶，onFulfilled 视为饮用水，resolve 视为开关。then 操作就是将饮用水一点点地注入到水桶中。想想我们还没将水加到水桶中（执行 then 操作）就打开开关（执行 resolve），这肯定是接不到水的。</p>
+<p>解决的办法就是将 resolve 函数的执行改为异步。</p>
+<h3 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h3><p>Promises/A+ 规范明确要求回调需要通过异步方式执行，保证一致可靠的执行顺序。通过 setTimeout 方法，我们可以轻松实现：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">resolve</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    pending.forEach(<span class="function"><span class="params">deferred</span> =&gt;</span> &#123;</span><br><span class="line">      deferred(value)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;, <span class="number">0</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样我们就可以把 resolve 执行放到下一个时钟周期。</p>
+<h3 id="引入状态"><a href="#引入状态" class="headerlink" title="引入状态"></a>引入状态</h3><p>按照 Promise 规范，我们需要引入三种互斥的状态：pending、fulfilled、rejected。</p>
+<p><img src="http://ww3.sinaimg.cn/large/aa0fbcc4gw1f61u9ne8d1j208u04umxc.jpg" alt="status"></p>
+<p>执行 resolve 会将 pending 状态切换到 fulfilled，在此之后添加到 then 到函数都会立即被调用。</p>
+<p>现在我们的代码如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Promise</span> (<span class="params">fn</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> deferreds = []</span><br><span class="line">  <span class="keyword">var</span> state = <span class="string">'pending'</span></span><br><span class="line">  <span class="keyword">var</span> value = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.then = <span class="function"><span class="keyword">function</span> (<span class="params">onFulfilled</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (state === <span class="string">'pending'</span>) &#123;</span><br><span class="line">      deferreds.push(onFulfilled)</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">this</span></span><br><span class="line">    &#125;</span><br><span class="line">    onFulfilled(value)</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">resolve</span> (<span class="params">_value</span>) </span>&#123;</span><br><span class="line">    state = <span class="string">'fulfilled'</span></span><br><span class="line">    value = _value</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      deferreds.forEach(<span class="function"><span class="params">deferred</span> =&gt;</span> &#123;</span><br><span class="line">        deferred(value)</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;, <span class="number">0</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  fn(resolve)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有了上面的基础，我们可以简单地调用 Promise：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">asyncReadFile(<span class="string">'./README.md'</span>, <span class="string">'utf-8'</span>).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(data)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>为了串行 Promise，我们在 then 中返回 this，并设置一个 value 来保存传给 resolve 的值。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">asyncReadFile(<span class="string">'./README.md'</span>, <span class="string">'utf-8'</span>).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(data)</span><br><span class="line">  <span class="keyword">return</span> asyncReadFile(<span class="string">'./package.json'</span>, <span class="string">'utf-8'</span>)</span><br><span class="line">&#125;).then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(data)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>像上面这样调用，虽然可以通过，但是两次输出的 data 是相同的值，并不是真正意义上的链式调用。</p>
+<h3 id="串行-Promise"><a href="#串行-Promise" class="headerlink" title="串行 Promise"></a>串行 Promise</h3><p>只要 then 方法每次调用都返回一个 Promise 对象，前一个 Promise 对象持有后一个 Promise 对象的 resolve 方法，这样串行就变得非常简单了。</p>
+<p>这里需要对 then 方法进行改造：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.then = <span class="function"><span class="keyword">function</span> (<span class="params">onFulfilled</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;</span><br><span class="line">    handle(&#123; onFulfilled, resolve &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">handle</span> (<span class="params">deferred</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (state === <span class="string">'pending'</span>) &#123;</span><br><span class="line">    deferreds.push(deferred)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> ret = deferred.onFulfilled(value)</span><br><span class="line">  deferred.resolve(ret)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里完成的主要任务是：</p>
+<ul>
+<li>then 方法中返回一个新的 Promise 对象，这样每次执行 then 方法，都返回一个 Promise 对象，让链式调用成为可能。</li>
+<li>新创建的 Promise 对象调用上一级 Promise 的 handle 方法，传递自身的 resolve 方法和当前的 onFulfilled 函数。</li>
+</ul>
+<p>handle 相比之前的 then 多了一行 <code>deferred.resolve(ret)</code>，这一步是链式调用的关键点。此刻的 resolve 是下一级 Promise 的方法，上一级 Promise 执行这段方法调用，就开启了链式调用。</p>
+<p>我们继续重构前面的 Promise 代码，这里主要修改的是 resolve 方法。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Promise</span> (<span class="params">fn</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> deferreds = []</span><br><span class="line">  <span class="keyword">var</span> state = <span class="string">'pending'</span></span><br><span class="line">  <span class="keyword">var</span> value = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.then = <span class="function"><span class="keyword">function</span> (<span class="params">onFulfilled</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// then 方法永远会返回一个 Promise 对象</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// handle 为上一级 Promise 的方法</span></span><br><span class="line">      handle(&#123; onFulfilled, resolve &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">handle</span> (<span class="params">deferred</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (state === <span class="string">'pending'</span>) &#123;</span><br><span class="line">      <span class="comment">// then 方法将 deferred 传入时，先压入到 deferreds 中</span></span><br><span class="line">      deferreds.push(deferred)</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 执行 Bridge Promise 前一个 Promise 对象的 then 方法的 onFulfilled 函数</span></span><br><span class="line">    <span class="keyword">const</span> ret = deferred.onFulfilled(value)</span><br><span class="line">    <span class="comment">// resolve 执行 deferreds 中的 onFulfilled 方法，即下一个 Bridge Promise 的 then 中的回调函数</span></span><br><span class="line">    deferred.resolve(ret)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">resolve</span> (<span class="params">_value</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 如果是 promise 对象</span></span><br><span class="line">    <span class="keyword">if</span> (_value &amp;&amp; (<span class="keyword">typeof</span> _value === <span class="string">'object'</span> || <span class="keyword">typeof</span> _value === <span class="string">'function'</span>)) &#123;</span><br><span class="line">      <span class="keyword">const</span> then = _value.then</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">typeof</span> then === <span class="string">'function'</span>) &#123;</span><br><span class="line">        <span class="comment">// 将 resolve 延迟到 promise 执行完毕后调用，切换 Bridge Promise 的状态。</span></span><br><span class="line">        then.call(_value, resolve)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果是其它值</span></span><br><span class="line">    state = <span class="string">'fulfilled'</span></span><br><span class="line">    value = _value</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      deferreds.forEach(<span class="function"><span class="params">deferred</span> =&gt;</span> &#123;</span><br><span class="line">        handle(deferred)</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;, <span class="number">0</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  fn(resolve)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Promise-具体流程"><a href="#Promise-具体流程" class="headerlink" title="Promise 具体流程"></a>Promise 具体流程</h2><ol>
+<li>实例化一个最初的 Promise 对象，设置最初的状态为 <code>pending</code>。</li>
+<li>通过 then 方法，创建一个新的 Promise 对象，由于上一级 Promise 暂时处于 pending 状态，当前 then 方法的 onFulfilled 函数和新 Promise 的 resolve 方法放入到上一级 Promise 的 deferreds 数组中。</li>
+<li>这样就形成这样一个画面：<strong>第一个 Promise 被实例化，调用 then 方法。then 会返回一个新的 Promise 对象，在上一个 then 方法的基础上继续通过新 Promise 的 then，形成一条调用链。<br>每一个被创建出来的新 Promise 的 resolve 都将传给上一级的 Promise 的 deferreds 数组来维护</strong></li>
+<li>在第一个 Promise 对象的回调函数中执行异步操作，完成后调用 Promise 的 resolve 方法。</li>
+<li>resolve 允许传入一个参数，该参数的值通过 Promise 内部的 value 变量维护。resolve 会把 Promise 的状态修改为 <code>fulfilled</code>，然后异步调用 handle 依次处理 deferreds 数组中的每一个 deferred。</li>
+<li>此时第一个 Promise 的状态在上一步骤中被改为 fulfilled，于是 handle 主要完成的工作是，执行 deferred 的 onFulfilled 函数，并调用下一个 Promise 的 resolve 方法。</li>
+<li>下一个 Promise 的 resovle 在上一级被执行成功后，同样会将状态切换到 <code>fulfilled</code> ，重复步骤 6 直到结束。</li>
+</ol>
+<p>这样 Promise 的核心逻辑，基本被我们实现了。至于 rejected 和 异常处理 就交给大家来思考吧（其实就是懒！）。</p>
+<p>结束语：真的很难想象就这么几十行代码，竟然有如此强大的威力，理解 Promise 并不难，需要敬佩的是创造强大 Promise 魔法的第一批程序员。</p>
+
+      
+    </div>
+
+    
+      
+      
+
+  <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="http://code.xnix.me">XueSeason</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="http://code.xnix.me/2016/07/21/剖析-Promise-内部机制/">http://code.xnix.me/2016/07/21/剖析-Promise-内部机制/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span>
+      
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/Promise/">Promise</a>
+            
+              <a href="/tags/源码/">源码</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+      <a class="prev" href="/2016/09/12/关于-SlidePlus-Hybrid-开发的一些总结/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">关于 SlidePlus Hybrid 开发的一些总结</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    
+    
+      <a class="next" href="/2016/06/01/Hybrid-App-优化笔记/">
+        <span class="next-text nav-default">Hybrid App 优化笔记</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:xueseason@icloud.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+        
+          <a href="https://twitter.com/xue_season" class="iconfont icon-twitter" title="twitter"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/xueseason" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://instagram.com/xue_season" class="iconfont icon-instagram" title="instagram"></a>
+        
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2016 - 
+    
+    2018
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">XueSeason</span>
+  </span>
+</div>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+  
+
+  
+
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.6.0"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.6.0"></script>
+
+  </body>
+</html>
