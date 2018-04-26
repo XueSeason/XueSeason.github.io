@@ -215,8 +215,8 @@
 <p>Hybrid 最简单的实现就是每次 App 启动就请求静态服务器，获取静态 HTML5 页面。后期需要更新 App，只需更新这个静态页面就可以了。但是这里就带来了一个问题就是，每次用户都需要请求静态页面，如果页面没有更新就会造成流量浪费的情况。解决这个问题的方案就是使用缓存，图片资源尽量借助 Native 的二级缓存机制，加载图片依次从内存、磁盘上查找，依旧没有才继续发送网络请求，然后将请求到的图片缓存到内存和磁盘中，供下次查找，同时配合 LRU 替换算法提高缓存命中和空间优化。好在上面的实现方案很多第三方框架已经帮我们解决，iOS 平台例如 SDWebImage、YYImage 等都是非常好的轮子。</p>
 <p>其他非图片的静态资源，比如 Vue 打包后的 js 以及 css 文件也大概有 200 kb 左右的资源，这里我们让它第一次请求后就缓存本地后，以后请求通过 etag 标签进行校验是否改动，没有修改则返回 304 然后从 cache 中读取，否则请求新的资源。etag 只需要服务器配置下，Native 端的 WebView 应该会自动实现此机制。这样可以将后续请求的流量从大概 200 kb 降到 1kb 不到。</p>
 <p>下面是优化前后的对比情况：</p>
-<p><img src="http://ww2.sinaimg.cn/large/aa0fbcc4gw1f4h6jzvyqcj20fs03pwf3.jpg" alt="before"></p>
-<p><img src="http://ww2.sinaimg.cn/large/aa0fbcc4gw1f4h6l8b67jj20fs03qjry.jpg" alt="after"></p>
+<p><img src="https://ww2.sinaimg.cn/large/aa0fbcc4gw1f4h6jzvyqcj20fs03pwf3.jpg" alt="before"></p>
+<p><img src="https://ww2.sinaimg.cn/large/aa0fbcc4gw1f4h6l8b67jj20fs03qjry.jpg" alt="after"></p>
 <p>可以看出加了 etag 后，不仅流量节省了，同时响应速度也快了不少。但是这里我们还需要注意到的情况就是即使这些静态资源没有被修改，但是我们还需要每次都请求网络来验证是否修改，虽然每次请求的数据量很小，但是还是可以继续优化。那就是适当地添加缓存过期时间，因为一般情况下我们不会每时每刻改变静态资源，这时候在添加 Cache-Control 或者 Expires ，让客户端在短时间内暂时从缓存中获取数据。</p>
 <p>一些静态页面我们甚至不需要请求网络，只需要保存到本地，每次 WebView 启动都去本地目录下找到静态页面并渲染。这样基本可以做到秒开而且无流量消耗。至于更新本地的目录，只需要做到当 App 启动时，从服务器获取到校验码来校验是否改变从而选择是否更新即可。</p>
 <h2 id="网络优化"><a href="#网络优化" class="headerlink" title="网络优化"></a>网络优化</h2><ul>
