@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://code.xnix.me/"/>
-  <updated>2018-04-28T02:31:26.277Z</updated>
+  <updated>2018-04-28T02:40:50.303Z</updated>
   <id>http://code.xnix.me/</id>
   
   <author>
@@ -21,9 +21,9 @@
     <link href="http://code.xnix.me/2018/04/28/%E5%8E%9F%E5%9E%8B%E9%93%BE%E7%90%86%E8%A7%A3/"/>
     <id>http://code.xnix.me/2018/04/28/原型链理解/</id>
     <published>2018-04-28T02:18:46.000Z</published>
-    <updated>2018-04-28T02:31:26.277Z</updated>
+    <updated>2018-04-28T02:40:50.303Z</updated>
     
-    <content type="html"><![CDATA[<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span> (<span class="params"></span>) </span>&#123;&#125;</span><br></pre></td></tr></table></figure><a id="more"></a><p>Person 函数的原型链：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(Object.prototype) &lt;- (Function.prototype) &lt;- Person.__proto__</span><br></pre></td></tr></table></figure><p>此时：</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Person.__proto__ === <span class="built_in">Function</span>.prototype <span class="comment">// true</span></span><br><span class="line">Person.__proto__.__proto === <span class="built_in">Object</span>.prototype <span class="comment">// true</span></span><br><span class="line">Person.prototype.constructor === Person <span class="comment">// true</span></span><br><span class="line">Person.constructor === Person.__proto__.constructor <span class="comment">// true</span></span><br><span class="line">Person.constructor === <span class="built_in">Function</span>.prototype.constructor <span class="comment">// true</span></span><br><span class="line">Person.prototype.__proto__ === <span class="built_in">Object</span>.prototype <span class="comment">// true</span></span><br></pre></td></tr></table></figure><p>首先需要明确 JS 里一切皆以对象的形式表现。</p><p>对象的 <code>__proto__</code> 属性指向构造该对象的构造函数的原型，这保证了该对象能够访问在构造函数原型中定义的属性和方法。</p><p>Person 是一个函数也是一个对象（在 JS 里是 First Class），它的构造函数是 Function 函数，Function 的原型是 Function.prototype。所以 <code>Person.__proto__</code> 等于 <code>Function.prototype</code>。</p><p><code>prototype</code> 属性只有函数才有，prototype 是一个对象。prototype 有一个 <code>constructor</code> 属性，一般通过 new 关键字来进行调用，我们称之为构造函数。所以 <code>Person.prototype.constructor</code> 等于 <code>Person</code>。</p><p>Person 自身并没有 constructor 函数，需要通过 <code>__proto__</code> 来找到上一级原型的 constructor，即 <code>Function.prototype.constructor</code>。</p><p>上面并没有像其他编程语言一样提到<strong>类</strong>的概念，因为 JS 没有类的概念，一般通过函数来模拟类的行为。</p><p>理解了上面，下面这种情况也就很好理解了：</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> x = <span class="keyword">new</span> Person()</span><br></pre></td></tr></table></figure><p>x 对象的原型链：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(Object.prototype) &lt;- (Person.prototype) &lt;- x.__proto__</span><br></pre></td></tr></table></figure><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x.__proto__ === Person.prototype</span><br><span class="line">x.__proto__.__proto__ === <span class="built_in">Object</span>.prototype</span><br></pre></td></tr></table></figure><p>最后用一张图来收官：</p><p><img src="http://www.mollypages.org/tutorials/jsobj.jpg" alt="proto"></p>]]></content>
+    <content type="html"><![CDATA[<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span> (<span class="params"></span>) </span>&#123;&#125;</span><br></pre></td></tr></table></figure><a id="more"></a><p>Person 函数的原型链：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(Object.prototype) &lt;- (Function.prototype) &lt;- Person.__proto__</span><br></pre></td></tr></table></figure><p>此时：</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Person.__proto__ === <span class="built_in">Function</span>.prototype <span class="comment">// true</span></span><br><span class="line">Person.__proto__.__proto === <span class="built_in">Object</span>.prototype <span class="comment">// true</span></span><br><span class="line">Person.prototype.constructor === Person <span class="comment">// true</span></span><br><span class="line">Person.constructor === Person.__proto__.constructor <span class="comment">// true</span></span><br><span class="line">Person.constructor === <span class="built_in">Function</span>.prototype.constructor <span class="comment">// true</span></span><br><span class="line">Person.prototype.__proto__ === <span class="built_in">Object</span>.prototype <span class="comment">// true</span></span><br></pre></td></tr></table></figure><p>首先需要明确 JS 里一切皆以对象的形式表现。</p><p>对象的 <code>__proto__</code> 属性指向构造该对象的构造函数的原型，这保证了该对象能够访问在构造函数原型中定义的属性和方法。</p><p>Person 是一个函数也是一个对象（在 JS 里是 First Class），它的构造函数是 Function 函数，Function 的原型是 Function.prototype。所以 <code>Person.__proto__</code> 等于 <code>Function.prototype</code>。</p><p><code>prototype</code> 属性只有函数才有，prototype 是一个对象。prototype 有一个 <code>constructor</code> 属性，一般通过 new 关键字来进行调用，我们称之为构造函数。所以 <code>Person.prototype.constructor</code> 等于 <code>Person</code>。</p><p>Person 自身并没有 constructor 函数，需要通过 <code>__proto__</code> 来找到上一级原型的 constructor，即 <code>Function.prototype.constructor</code>。</p><p>上面并没有像其他编程语言一样提到<strong>类</strong>的概念，因为 JS 没有类的概念，一般通过函数来模拟类的行为。</p><p>理解了上面，下面这种情况也就很好理解了：</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> x = <span class="keyword">new</span> Person()</span><br></pre></td></tr></table></figure><p>x 对象的原型链：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(Object.prototype) &lt;- (Person.prototype) &lt;- x.__proto__</span><br></pre></td></tr></table></figure><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x.__proto__ === Person.prototype</span><br><span class="line">x.__proto__.__proto__ === <span class="built_in">Object</span>.prototype</span><br></pre></td></tr></table></figure><p>最后用一张图来收官：</p><p><img src="https://hybrid.xiaoying.tv/viva-spread/other/jsobj.jpg" alt="proto"></p>]]></content>
     
     <summary type="html">
     
@@ -116,9 +116,9 @@
     </summary>
     
     
-      <category term="源码" scheme="http://code.xnix.me/tags/%E6%BA%90%E7%A0%81/"/>
-    
       <category term="Redux" scheme="http://code.xnix.me/tags/Redux/"/>
+    
+      <category term="源码" scheme="http://code.xnix.me/tags/%E6%BA%90%E7%A0%81/"/>
     
   </entry>
   
@@ -182,9 +182,9 @@
     </summary>
     
     
-      <category term="Promise" scheme="http://code.xnix.me/tags/Promise/"/>
-    
       <category term="源码" scheme="http://code.xnix.me/tags/%E6%BA%90%E7%A0%81/"/>
+    
+      <category term="Promise" scheme="http://code.xnix.me/tags/Promise/"/>
     
   </entry>
   
