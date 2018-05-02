@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://code.xnix.me/"/>
-  <updated>2018-04-28T02:40:50.303Z</updated>
+  <updated>2018-05-02T07:50:47.673Z</updated>
   <id>http://code.xnix.me/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Rollup 初探</title>
+    <link href="http://code.xnix.me/2018/05/02/Rollup-%E5%88%9D%E6%8E%A2/"/>
+    <id>http://code.xnix.me/2018/05/02/Rollup-初探/</id>
+    <published>2018-05-02T06:19:08.000Z</published>
+    <updated>2018-05-02T07:50:47.673Z</updated>
+    
+    <content type="html"><![CDATA[<p>在传统软件开发的领域中，模块化开发将项目拆分成多个独立的模块便于维护。但是在过去 JS 因为历史原因而不具备这一核心功能。直到 ES6 带来了 ES Modules，但是这些并没有在浏览器和 Node.js 下实现。<br><a id="more"></a><br>可以将 Rollup 想像成 Babel，让你在编写代码的时候使用 ES Modules 这一特性，通过 Rollup 编译后降级为所支持的的格式代码（CommonJS，AMD modules 或者 IIFE 风格的脚本）。</p><p>Rollup 发布后，相比当时的 Webpack 一个最大的亮点就是 Tree-shaking（Webpack 后续也实现了这个功能）。</p><p>Rollup 会对 <code>import</code> 和 <code>export</code> 语句进行静态分析，只导入当前项目实际会运行的代码。这一也被称之为 <strong><em>live code inclusion</em></strong>。类似于 <strong><em>dead code elimination</em></strong>，但是更有效率（后者是消除无关代码）。大部分情况下 Tree-shaking 是个美丽的童话，因为在动态语言上进行静态分析是非常困难的，比如我们无法从对象上移除无用的方法。</p><p>那么 Rollup 是不是就一无是处了呢？Three-shaking 只是 Rollup 的一部分，相比 Webpack 会带来更多 modules 实现的相关代码，Rollup 会尽可能的保留原始代码，这一特点非常适合编写地方库。</p><p>在 JS 社区中，大量第三方库开始 Rollup，但是 Rollup 同样可以被用于大型应用。如果你想使用代码分割以及动态导入的功能，官方推荐使用 SystemJS。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在传统软件开发的领域中，模块化开发将项目拆分成多个独立的模块便于维护。但是在过去 JS 因为历史原因而不具备这一核心功能。直到 ES6 带来了 ES Modules，但是这些并没有在浏览器和 Node.js 下实现。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="Rollup" scheme="http://code.xnix.me/tags/Rollup/"/>
+    
+  </entry>
   
   <entry>
     <title>原型链理解</title>
@@ -116,9 +136,9 @@
     </summary>
     
     
-      <category term="Redux" scheme="http://code.xnix.me/tags/Redux/"/>
-    
       <category term="源码" scheme="http://code.xnix.me/tags/%E6%BA%90%E7%A0%81/"/>
+    
+      <category term="Redux" scheme="http://code.xnix.me/tags/Redux/"/>
     
   </entry>
   
@@ -182,9 +202,9 @@
     </summary>
     
     
-      <category term="源码" scheme="http://code.xnix.me/tags/%E6%BA%90%E7%A0%81/"/>
-    
       <category term="Promise" scheme="http://code.xnix.me/tags/Promise/"/>
+    
+      <category term="源码" scheme="http://code.xnix.me/tags/%E6%BA%90%E7%A0%81/"/>
     
   </entry>
   

@@ -17,7 +17,7 @@
 
 
 
-  <meta name="description" content="Make coding more interesting."/>
+  <meta name="description" content="Rollup 初探"/>
 
 
 
@@ -42,7 +42,7 @@
 
 
 
-<link rel="canonical" href="http://code.xnix.me/archives/2017/"/>
+<link rel="canonical" href="http://code.xnix.me/2018/05/02/Rollup-初探/"/>
 
 
 <link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
@@ -97,11 +97,7 @@
 
 
 
-    <title>
-  
-    归档 - Code Craft
-  
-</title>
+    <title> Rollup 初探 - Code Craft </title>
   </head>
 
   <body><div id="mobile-navbar" class="mobile-navbar">
@@ -177,95 +173,103 @@
           <div id="content" class="content">
             
   
-  <section id="archive" class="archive">
-    
-      
-        <div class="archive-title">
-          <span class="archive-post-counter">
-            目前共计 10 篇日志
-          </span>
-        </div>
-      
-    
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Rollup 初探
+        
+      </h1>
 
-    
-      
+      <div class="post-meta">
+        <span class="post-time">
+          2018-05-02
+        </span>
         
         
-
-        
-          
-          <div class="collection-title">
-            <h2 class="archive-year">2017</h2>
+        <div class="post-visits"
+             data-url="/2018/05/02/Rollup-初探/"
+             data-title="Rollup 初探">
+            阅读次数
           </div>
         
-      
-
-      <div class="archive-post">
-        <span class="archive-post-time">
-          
-            11-09
-          
-        </span>
-        <span class="archive-post-title">
-          <a href="/2017/11/09/React-文档笔记/" class="archive-post-link">
-            React 文档笔记
-          </a>
-        </span>
       </div>
+    </header>
+
+    
+    
+
+    <div class="post-content">
+      
+        <p>在传统软件开发的领域中，模块化开发将项目拆分成多个独立的模块便于维护。但是在过去 JS 因为历史原因而不具备这一核心功能。直到 ES6 带来了 ES Modules，但是这些并没有在浏览器和 Node.js 下实现。<br><a id="more"></a><br>可以将 Rollup 想像成 Babel，让你在编写代码的时候使用 ES Modules 这一特性，通过 Rollup 编译后降级为所支持的的格式代码（CommonJS，AMD modules 或者 IIFE 风格的脚本）。</p>
+<p>Rollup 发布后，相比当时的 Webpack 一个最大的亮点就是 Tree-shaking（Webpack 后续也实现了这个功能）。</p>
+<p>Rollup 会对 <code>import</code> 和 <code>export</code> 语句进行静态分析，只导入当前项目实际会运行的代码。这一也被称之为 <strong><em>live code inclusion</em></strong>。类似于 <strong><em>dead code elimination</em></strong>，但是更有效率（后者是消除无关代码）。大部分情况下 Tree-shaking 是个美丽的童话，因为在动态语言上进行静态分析是非常困难的，比如我们无法从对象上移除无用的方法。</p>
+<p>那么 Rollup 是不是就一无是处了呢？Three-shaking 只是 Rollup 的一部分，相比 Webpack 会带来更多 modules 实现的相关代码，Rollup 会尽可能的保留原始代码，这一特点非常适合编写地方库。</p>
+<p>在 JS 社区中，大量第三方库开始 Rollup，但是 Rollup 同样可以被用于大型应用。如果你想使用代码分割以及动态导入的功能，官方推荐使用 SystemJS。</p>
+
+      
+    </div>
+
     
       
-        
-        
-
-        
       
 
-      <div class="archive-post">
-        <span class="archive-post-time">
-          
-            11-08
-          
-        </span>
-        <span class="archive-post-title">
-          <a href="/2017/11/08/重读-Redux-源码/" class="archive-post-link">
-            重读 Redux 源码
-          </a>
-        </span>
-      </div>
-    
+  <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="http://code.xnix.me">XueSeason</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="http://code.xnix.me/2018/05/02/Rollup-初探/">http://code.xnix.me/2018/05/02/Rollup-初探/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span>
       
-        
-        
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
 
-        
+
+
       
-
-      <div class="archive-post">
-        <span class="archive-post-time">
-          
-            04-01
-          
-        </span>
-        <span class="archive-post-title">
-          <a href="/2017/04/01/Docker-使用笔记/" class="archive-post-link">
-            Docker 使用笔记
-          </a>
-        </span>
-      </div>
+      
     
-  </section>
 
-  
-  <nav class="pagination">
     
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/Rollup/">Rollup</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+    
+      <a class="next" href="/2018/04/28/原型链理解/">
+        <span class="next-text nav-default">原型链理解</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
     
   </nav>
 
+      </footer>
+    
+
+  </article>
 
 
           </div>
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
       </main>
@@ -352,6 +356,11 @@
     </div>
 
     
+  
+  
+
+  
+
 
 
     
