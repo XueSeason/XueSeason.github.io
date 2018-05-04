@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+
+  <meta name="description" content="深入 ES Modules（译）"/>
+
+
+
+
+  <meta name="keywords" content="developer" />
+
+
+
+
+
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Code Craft">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.6.0" />
+
+
+
+<link rel="canonical" href="http://code.xnix.me/2018/05/04/深入-ES-Modules/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
+
+
+
+
+
+
+  
+  <script id="baidu_analytics">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e509e1f2c72a7907e19e99765a50b858";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.1.1/av-min.js"></script>
+  <script id="leancloud">
+    AV.init({
+      appId: "1KzfleDz7INCo32JTaHqqTNL-9Nh9j0Va",
+      appKey: "iB34bYSRr6XLtbwubkyvGGoH"
+    });
+  </script>
+
+
+
+
+
+    <title> 深入 ES Modules（译） - Code Craft </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">Code Craft</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            首页
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            归档
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Code Craft</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              首页
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              归档
+            
+          </a>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          深入 ES Modules（译）
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-05-04
+        </span>
+        
+        
+        <div class="post-visits"
+             data-url="/2018/05/04/深入-ES-Modules/"
+             data-title="深入 ES Modules（译）">
+            阅读次数
+          </div>
+        
+      </div>
+    </header>
+
+    
+    
+  <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#最初的-JS"><span class="toc-text">最初的 JS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#加入模块化后"><span class="toc-text">加入模块化后</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ES-Modules-工作原理"><span class="toc-text">ES Modules 工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#构造"><span class="toc-text">构造</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查找并获取文件"><span class="toc-text">查找并获取文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Module-specifier"><span class="toc-text">Module specifier</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#共享-Module-Instance"><span class="toc-text">共享 Module Instance</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析"><span class="toc-text">解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实例化"><span class="toc-text">实例化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#赋值"><span class="toc-text">赋值</span></a></li></ol></li></ol>
+    </div>
+  </div>
+
+
+    <div class="post-content">
+      
+        <p>ES Modules 使 JS 的模块系统标准化。这一标准化的工作差不多经历了 10 年。</p>
+<p>随着今年 5 月份 Firefox 60 的发布，所有的主流浏览器都将支持 ES Modules。此外 Node.js 团队当前也正在支持 ES Modules。代表 Web 未来的 WebAssembly 也正在集成 ES Modules。</p>
+<p>让我们先看看 ES Modules 解决了什么问题以及和其他模块系统的不同。<br><a id="more"></a></p>
+<h2 id="最初的-JS"><a href="#最初的-JS" class="headerlink" title="最初的 JS"></a>最初的 JS</h2><p>最初 JS 只有函数作用域的概念，函数内部变量对外不可见。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/02_module_scope_01-768x448.png" alt="function scope"></p>
+<p>但是不同函数作用域却无法共享变量。最简单的方式，把这个变量放到上一级作用域（比如全局作用域）。</p>
+<p>例如 jQuery，当你需要使用 jQuery 的其他插件库时，必须确保 jQuery 在你的全局作用域里。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/02_module_scope_02-768x691.png" alt="global scope"></p>
+<p>这样存在两个不足：</p>
+<ul>
+<li><p><strong>不明确的依赖关系</strong>。项目会变得难以维护，当修改历史代码时，加大整个项目崩溃的不确定性。</p>
+</li>
+<li><p><strong>造成全局变量污染</strong>。由于变量从全局作用域中获取，无法保证这个变量的正确性（可能被其他代码所修改）。</p>
+</li>
+</ul>
+<h2 id="加入模块化后"><a href="#加入模块化后" class="headerlink" title="加入模块化后"></a>加入模块化后</h2><p>模块作用域让内部的变量可以被其他模块获取，其他模块可以明确指定获取哪些变量、类或者函数。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/02_module_scope_04-768x691.png" alt="module scope"></p>
+<p>这样完美地解决了上面的两个不足。</p>
+<p>在过去的模块化发展道路上，出现了大量模块化方案，当前 Node.js 所流行的 CommonJS 即将成为历史。ESM 作为新的模块化系统已经被加入了 JS 规范当中。浏览器已经支持了 ES Modules，Node.js 正在支持。</p>
+<h2 id="ES-Modules-工作原理"><a href="#ES-Modules-工作原理" class="headerlink" title="ES Modules 工作原理"></a>ES Modules 工作原理</h2><p>通过 import 语句明确所需要加载的代码：</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/04_import_graph-768x447.png" alt="dependencies"></p>
+<p>浏览器会先解析文件，创建 Module Record：</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/05_module_record-768x441.png" alt="Module Record"></p>
+<p>随后 Module Record 需要被转成一个 Module Instance ，Module Instance 主要由<code>代码(code)</code>和<code>状态(state)</code>组成。</p>
+<ul>
+<li>code 是一系列指令，负责执行逻辑。</li>
+<li>state 是指令所需要的计算机资源，通常是内存上保存的值。</li>
+</ul>
+<p>我们可以将 code 看做引擎，state 就是汽油。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/06_module_instance-768x572.png" alt="code state"></p>
+<p>我们需要得到每一个 Module 的 Module Instance。整个 Module 的加载过程从一个入口文件开始构造一张完整的 Module Instance 依赖图。</p>
+<p>对于 ES Modules 会进行以下三步骤：</p>
+<ol>
+<li>构造 - 获取文件，将文件解析为 Module Record。</li>
+<li>实例化 - 从内存中申请一个空间（但是并没有进行赋值）。然后将 import 和 export 的变量的指针都指向这个空间地址。称之为链接（linking）。</li>
+<li>赋值 - 运行代码，得到变量实际的值后填充到内存空间。</li>
+</ol>
+<p><img src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/files/2018/03/07_3_phases.png" alt="three steps"></p>
+<p>上述三个阶段可以独立执行，这让 ES Modules 能够实现异步加载。但是 ES Modules 也可以同步加载，这取决于加载方式。这里分成两种规格：</p>
+<ul>
+<li>ES module spec，规定了如何构造、实例化和赋值（上述三个步骤），但是并没有规定如何获取到文件。</li>
+<li>Load module spec，不同规格规定了 loader 的加载方式，比如浏览器的 HTML spec。</li>
+</ul>
+<p><img src="https://hacks.mozilla.org/files/2018/03/07_loader_vs_es-768x439.png" alt="spec"></p>
+<p>Loader 可以直接调用 ES Module 的方法 - <code>ParseModule</code>, <code>Module.Instantiate</code>, 和 <code>Module.Evaluate</code>，从而控制 ES Module 的整个实现过程。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/08_loader_as_puppeteer-768x507.png" alt="puppeteer"></p>
+<p>下面是更详细的实现细节。</p>
+<h3 id="构造"><a href="#构造" class="headerlink" title="构造"></a>构造</h3><p>构造阶段发生三件事：</p>
+<ol>
+<li>Module resolution，也就是获取文件的地址。</li>
+<li>获取文件（通过 URL 下载、从文件系统加载）。</li>
+<li>将文件解析为 Module Record。</li>
+</ol>
+<h3 id="查找并获取文件"><a href="#查找并获取文件" class="headerlink" title="查找并获取文件"></a>查找并获取文件</h3><p>首先从一个入口文件出发。在 HTML 中，通过一个 script 标签告诉 Loader 来查找相关文件。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/08_script_entry-768x288.png" alt="entry"></p>
+<p>然后通过代码里的 import 语句中的标识符（module specifier）告诉 Loader 下一个需要加载的 Module。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/09_module_specifier-768x161.png" alt="module specifier"></p>
+<h4 id="Module-specifier"><a href="#Module-specifier" class="headerlink" title="Module specifier"></a>Module specifier</h4><p>每一个宿主环境（通常是浏览器和 Node）有各自的 <code>module resolution algorithm</code> 来解释模块标识符字符串。有些模块标识符可以在 Node 环境中工作但是在浏览器中还无法工作，<a href="https://github.com/domenic/package-name-maps" target="_blank" rel="noopener">不过也快了</a>。</p>
+<p>目前浏览器只接受 URL 作为模块标识符，通过 URL 可以加载相关的模块文件。在解析文件前，是无法得知后续需要获取的模块文件；同时在获取到文件前，也无法解析该模块文件。所以浏览器并不会同时加载整个依赖图的所有模块文件。</p>
+<p>也就是说必须先一层层地遍历依赖图，解析一个模块文件，然后得到相关依赖，再查找并加载这些依赖，如此循环。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/10_construction-768x464.png" alt="go through"></p>
+<p>如果主线程需要等待每个模块文件的下载（耗时任务），其他任务就会在队列中堆积。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/11_latency-768x415.png" alt="long time task"></p>
+<p>主线程被阻塞会让整个应用变得卡顿，这也就是为什么 ES Modules spec 将模块的装载工作分成三个阶段。浏览器便可以异步获取文件，在构造过程中解析文件，得到模块依赖图，然后进行后续的同步实例化工作。</p>
+<p>这也是 ES Modules 和 CommonJS 最关键的不同点。</p>
+<p>CommonJS 并不需要考虑异步，因为在 Node 中是通过文件系统来加载模块文件，这比网络请求要快得多。这就允许 Node 在加载这些文件的时候阻塞主线程。也就是说在返回一个 Module Instance 之前，Node 已经遍历了整个依赖树，同时也完成了实例化和赋值的操作。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/12_cjs_require-768x457.png" alt="CommonJS"></p>
+<p>因为 Node 采用 CommonJS 规范，你的模块标识符可以是一个变量（这在 ES Modules 中是不允许的，只有声明和语句才被允许）。同时因为加载是同步过程，同时进行了实例化和赋值操作，得到的变量也能同时得到其值。</p>
+<p>但是 ES Modules 是预先构造好整个依赖图，然后才有赋值操作。这就造成在模块标识符字符串中不能使用变量（此时还没有值）。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/13_static_import-768x225.png" alt="variables in module specifiers"></p>
+<p>这一不足，可以通过<a href="https://github.com/tc39/proposal-dynamic-import" target="_blank" rel="noopener">动态导入（dynamic import）</a>弥补，形如 <code>import(&#96;${path}/foo.js&#96;)</code></p>
+<p>这相当于构造一张新的依赖图，后续处理过程也是独立的。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/14dynamic_import_graph-768x597.png" alt="dynamic import"></p>
+<h4 id="共享-Module-Instance"><a href="#共享-Module-Instance" class="headerlink" title="共享 Module Instance"></a>共享 Module Instance</h4><p>Loader 会缓存创建好的 Module Instance，如此一来，当多个模块依赖于一个模块，只会进行一次加载模块文件的操作，这样减少了引擎的压力。</p>
+<p>Loader 会通过 Module Map 来管理这些缓存。</p>
+<p>当需要获取指定模块文件，先将这个 URL 标记为 <strong>fetching</strong> 状态，然后再发送请求并开始下一个获取操作。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/15_module_map-768x261.png" alt="fetching"></p>
+<p>如果其他文件依赖了相同的模块文件，Loader 会先遍历 Module Map 里的 URL，当 URL 是 fetching 状态时，直接跳过并开始下一个获取操作。</p>
+<h3 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h3><p>获取到文件后，需要将其解析为 Module Record。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/25_file_to_module_record-768x306.png" alt="parse"></p>
+<p>Module Record 被创建后，会更新 Module Map。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/25_module_map-768x367.png" alt="Module Map"></p>
+<p>ES Module 通过 <strong>parse goal</strong> 来决定解析方式。</p>
+<p>浏览器通过 script 的 type 属性来确定使用解析方式，<code>type=&quot;module&quot;</code> 告诉浏览器以 Module 方式解析。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/26_parse_goal-768x477.png" alt="type module"></p>
+<p>但是在 Node 环境中，通常使用 <code>.mjs</code> 扩展名，这一方式还在讨论中，并不是最终方案。</p>
+<p>下一步就开始实例化 Module，并链接所有 Module Instance。</p>
+<h3 id="实例化"><a href="#实例化" class="headerlink" title="实例化"></a>实例化</h3><p>实例化的过程就是申请内存空间并绑定地址的过程。</p>
+<p>首先 JS 引擎会为 Module Record 创建各自的 Module Environment Record，然后申请内存空间，通过 Module Environment Record 将 Module Record 导出的字段和相关的内存空间绑定。导出的函数声明在这个阶段被初始化，这让后续的赋值操作变得简单。</p>
+<p>模块依赖图中的各个模块通过深度优先算法实例化。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/30_live_bindings_01-768x316.png" alt="wire up exports"></p>
+<p>先进行 exports 的链接操作，然后再回到顶层开始 imports 的链接操作。相匹配的 export 和 import 都会指向同一个内存地址</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/30_live_bindings_02-768x316.png" alt="wire up imports"></p>
+<p>CommonJS 不同于 ES Modules，它的 export 操作会进行拷贝导出。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/31_cjs_variable-768x174.png" alt="copy export"></p>
+<p>相反，ES Modules 称之为 live binding，虽然 import 导入的数据是无法修改的，但是依旧会造成 import module 的对象的属性发生改变，会影响到 export module 里的对象。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/30_live_bindings_04-768x316.png" alt="live binding"></p>
+<h3 id="赋值"><a href="#赋值" class="headerlink" title="赋值"></a>赋值</h3><p>最后一步就是往内存空间中填充数据，JS 引擎会从顶层开始执行代码。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/40_top_level_code-768x224.png" alt="side effects"></p>
+<p>上述代码导出的函数有潜在副作用（函数式编程的术语），所以模块的赋值操作只能进行一次。这就是引入 Module Map 的原因。因为每个模块都有唯一的 Module Record，保证了每个模块都只被执行一次，同样也是深度优先的方式执行。</p>
+<p>和 CommonJS 不同，ES Modules 能够解决循环依赖的问题（cyclic dependency）：</p>
+<p>首先是一个简单的例子</p>
+<p><img src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/files/2018/03/41_cyclic_graph.png" alt="usually"></p>
+<p>看看 CommonJS 的逻辑：</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/41_cjs_cycle-768x344.png" alt="step 0"></p>
+<p>Counter 模块尝试获取 message 变量，但是 main 模块并没有执行完毕，所以得到 undefined。此时 JS 引擎为 Counter 中的 message 变量申请内存空间并设置为 undefined。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/43_cjs_cycle-768x344.png" alt="step 1"></p>
+<p>当代码执行回到 main 模块中，message 变量会被初始化并添加到内存空间中，但是 Counter 模块无法感知。</p>
+<p><img src="https://hacks.mozilla.org/files/2018/03/44_cjs_variable_2-768x331.png" alt="step 2"></p>
+<p>如果是 ES Modules 的 live binding，counter 模块最终会看到正确的值，因为在 timeout 运行前，main 模块的赋值操作已经完成。这正是 ES Modules 包含三个阶段的设计带来的好处。</p>
+<p>本文讲到这里也差不多结束了，以上所有内容主要是对<a href="https://hacks.mozilla.org/2018/03/es-modules-a-cartoon-deep-dive/" target="_blank" rel="noopener">《ES modules: A cartoon deep-dive》</a>这篇文章进行翻译后加上自己的总结。</p>
+
+      
+    </div>
+
+    
+      
+      
+
+  <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="http://code.xnix.me">XueSeason</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="http://code.xnix.me/2018/05/04/深入-ES-Modules/">http://code.xnix.me/2018/05/04/深入-ES-Modules/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span>
+      
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/ES-Modules/">ES Modules</a>
+            
+              <a href="/tags/翻译/">翻译</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+    
+      <a class="next" href="/2018/05/02/Rollup-初探/">
+        <span class="next-text nav-default">Rollup 初探</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:xueseason@icloud.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/xueseason" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://instagram.com/xue_season" class="iconfont icon-instagram" title="instagram"></a>
+        
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2016 - 
+    
+    2018
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">XueSeason</span>
+  </span>
+</div>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+  
+
+  
+
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.6.0"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.6.0"></script>
+
+  </body>
+</html>
