@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+
+  <meta name="description" content="简单解释器构造 - Part.1"/>
+
+
+
+
+  <meta name="keywords" content="developer" />
+
+
+
+
+
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Code Craft">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.6.0" />
+
+
+
+<link rel="canonical" href="http://code.xnix.me/2018/05/07/简单解释器构造-Part-1/"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
+
+
+
+
+
+
+  
+  <script id="baidu_analytics">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e509e1f2c72a7907e19e99765a50b858";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.1.1/av-min.js"></script>
+  <script id="leancloud">
+    AV.init({
+      appId: "1KzfleDz7INCo32JTaHqqTNL-9Nh9j0Va",
+      appKey: "iB34bYSRr6XLtbwubkyvGGoH"
+    });
+  </script>
+
+
+
+
+
+    <title> 简单解释器构造 - Part.1 - Code Craft </title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">Code Craft</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    
+      <a href="/">
+        <li class="mobile-menu-item">
+          
+          
+            首页
+          
+        </li>
+      </a>
+    
+      <a href="/archives/">
+        <li class="mobile-menu-item">
+          
+          
+            归档
+          
+        </li>
+      </a>
+    
+  </ul>
+</nav>
+
+    <div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">Code Craft</a>
+</div>
+
+<nav class="site-navbar">
+  
+    <ul id="menu" class="menu">
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/">
+            
+            
+              首页
+            
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            
+            
+              归档
+            
+          </a>
+        </li>
+      
+    </ul>
+  
+</nav>
+
+      </header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content">
+            
+  
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          简单解释器构造 - Part.1
+        
+      </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-05-07
+        </span>
+        
+        
+        <div class="post-visits"
+             data-url="/2018/05/07/简单解释器构造-Part-1/"
+             data-title="简单解释器构造 - Part.1">
+            阅读次数
+          </div>
+        
+      </div>
+    </header>
+
+    
+    
+
+    <div class="post-content">
+      
+        <p>无论你是新手还是经验丰富的开发者，如果你不知道编译器和解释器的工作原理，你也不会知道计算机是如何工作的。<br><a id="more"></a><br>为什么需要学习解释器和编译器？有三个原因：</p>
+<ol>
+<li>编写一个解释器或者编译器，需要学习并使用大量的技术。这能够帮助你提高技术从而变成一个更好的开发者。同时这些学到的技术，可以运用在其他开发领域。</li>
+<li>你真的非常渴望了解计算机的工作原理。清楚解释器和编译器的构建过程，理解工作原理，让代码更可控。</li>
+<li>你想自创一门编程语言或者 DSL。</li>
+</ol>
+<p>通常我们的程序是用高级语言编写的，计算机并不能理解高级语言，我们需要通过解释器或者编译将高级编程语言转为另一种形式，方便计算机理解。</p>
+<p>将源程序转为机器语言进行处理（计算机可以直接理解的语言）的工具称之为编译器；直接处理高级语言（没有直接转化为机器语言）的工具称之为解释器。</p>
+<p><img src="https://ruslanspivak.com/lsbasi-part1/lsbasi_part1_compiler_interpreter.png" alt="compiler and interpreter"></p>
+<p>下面是 Pascal 的阶乘函数例子：</p>
+<figure class="highlight pascal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">program</span> factorial;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">factorial</span><span class="params">(n: interger)</span>:</span> longint;</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> n = <span class="number">0</span> <span class="keyword">then</span></span><br><span class="line">        factorial := <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        factorial := n * factorial(n - <span class="number">1</span>);</span><br><span class="line"><span class="keyword">end</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span></span><br><span class="line">    n: interger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">for</span> n := <span class="number">0</span> <span class="keyword">to</span> <span class="number">16</span> <span class="keyword">do</span></span><br><span class="line">        writeln(n, <span class="string">'! = '</span>, factorial(n));</span><br><span class="line"><span class="keyword">end</span>.</span><br></pre></td></tr></table></figure>
+<p>先为解释器实现一个简单算数表达式，最简单的就是两个整数相加：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Token types</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> INTEGER = <span class="string">'INTEGER'</span></span><br><span class="line"><span class="keyword">const</span> PLUS = <span class="string">'PLUS'</span></span><br><span class="line"><span class="keyword">const</span> EOF = <span class="string">'EOF'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Token</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span> (type, value) &#123;</span><br><span class="line">    <span class="comment">// token type: INTEGER, PLUS or EOF</span></span><br><span class="line">    <span class="keyword">this</span>.type = type</span><br><span class="line">    <span class="comment">// token value: 0, 1, 2, 3, 4, 8, 9, '+', or None</span></span><br><span class="line">    <span class="keyword">this</span>.value = value</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * String representation of the class instance.</span></span><br><span class="line"><span class="comment">   * Examples:</span></span><br><span class="line"><span class="comment">   *     Token(INTEGER, 3)</span></span><br><span class="line"><span class="comment">   *     Token(PLUS, +)</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  toString () &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`Token(<span class="subst">$&#123;<span class="keyword">this</span>.type&#125;</span>, <span class="subst">$&#123;<span class="keyword">this</span>.value&#125;</span>)`</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Interpreter</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span> (text) &#123;</span><br><span class="line">    <span class="comment">// client string input, e.g. "3+5"</span></span><br><span class="line">    <span class="keyword">this</span>.text = text</span><br><span class="line">    <span class="comment">// this.pos is an index into this.text</span></span><br><span class="line">    <span class="keyword">this</span>.pos = <span class="number">0</span></span><br><span class="line">    <span class="comment">// current token instance</span></span><br><span class="line">    <span class="keyword">this</span>.currentToken = <span class="literal">null</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Lexical analyzer (also known as scanner or tokenizer)</span></span><br><span class="line"><span class="comment">   * This method is responsible for breaking a sentence</span></span><br><span class="line"><span class="comment">   * apart into tokens. One part at a time.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  getNextToken () &#123;</span><br><span class="line">    <span class="keyword">const</span> text = <span class="keyword">this</span>.text</span><br><span class="line">    <span class="comment">// is this.pos index past the end of the thsi.text?</span></span><br><span class="line">    <span class="comment">// if so, then return EOF token because there is no more</span></span><br><span class="line">    <span class="comment">// input left to convert into kokens</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.pos &gt; text.length - <span class="number">1</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> Token(EOF, <span class="literal">null</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// get a character at the position this.pos and decide</span></span><br><span class="line">    <span class="comment">// what token to create based on the single character</span></span><br><span class="line">    <span class="keyword">const</span> currentChar = text[<span class="keyword">this</span>.pos]</span><br><span class="line">    <span class="comment">// if the character is a digit then convert it to</span></span><br><span class="line">    <span class="comment">// integer, create an INTEGER token, increment this.pos</span></span><br><span class="line">    <span class="comment">// index to point to the next character after the digit</span></span><br><span class="line">    <span class="comment">// and return the INTEGER token</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">Number</span>.isInteger(+currentChar)) &#123;</span><br><span class="line">      <span class="keyword">const</span> token = <span class="keyword">new</span> Token(INTEGER, +currentChar)</span><br><span class="line">      <span class="keyword">this</span>.pos += <span class="number">1</span></span><br><span class="line">      <span class="keyword">return</span> token</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (currentChar === <span class="string">'+'</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> token = <span class="keyword">new</span> Token(PLUS, currentChar)</span><br><span class="line">      <span class="keyword">this</span>.pos += <span class="number">1</span></span><br><span class="line">      <span class="keyword">return</span> token</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Error pasring input'</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  eat (tokenType) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.currentToken.type === tokenType) &#123;</span><br><span class="line">      <span class="keyword">this</span>.currentToken = <span class="keyword">this</span>.getNextToken()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Error pasring input'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * expr -&gt; INTEGER PLUS INTEGER</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  expr () &#123;</span><br><span class="line">    <span class="comment">// set current token to the first token taken from the input</span></span><br><span class="line">    <span class="keyword">this</span>.currentToken = <span class="keyword">this</span>.getNextToken()</span><br><span class="line">    <span class="comment">// we expect the current token to be a signle-digit integer.</span></span><br><span class="line">    <span class="keyword">const</span> left = <span class="keyword">this</span>.currentToken</span><br><span class="line">    <span class="keyword">this</span>.eat(INTEGER)</span><br><span class="line">    <span class="comment">// we expect the current token to be a '+' token</span></span><br><span class="line">    <span class="keyword">const</span> op = <span class="keyword">this</span>.currentToken</span><br><span class="line">    <span class="keyword">this</span>.eat(PLUS)</span><br><span class="line">    <span class="comment">// we expect the current token to be a signle-digit integer.</span></span><br><span class="line">    <span class="keyword">const</span> right = <span class="keyword">this</span>.currentToken</span><br><span class="line">    <span class="keyword">this</span>.eat(INTEGER)</span><br><span class="line">    <span class="comment">// after the above call the this.currentToken is set to EOF token</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> result = left.value + right.value</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> text = <span class="string">'3+5'</span></span><br><span class="line">  <span class="keyword">const</span> interpreter = <span class="keyword">new</span> Interpreter(text)</span><br><span class="line">  <span class="built_in">console</span>.log(interpreter.expr()) <span class="comment">// 2</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">  <span class="built_in">console</span>.error(error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面代码需要遵守三条规则：</p>
+<ol>
+<li>只允许输入一位数字</li>
+<li>只支持加法操作</li>
+<li>不允许空格字符输入</li>
+</ol>
+<p>为了让解释器能够理解 <code>&quot;3+5&quot;</code>，需要将字符串分解成各组件，这些组件称为 <code>token</code>。Token 是一个对象，拥有 type 和 value 属性。</p>
+<p>将输入的字符串分解成 token 的过程，称为词法分析（lexical analysis），简称 laxer。所以第一步解释器需要读取输入的字符，然后转为 token 流。</p>
+<p>方法 <code>getNextToken</code> 是解释器的词法分析器：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> text = <span class="string">'3+5'</span></span><br><span class="line"><span class="keyword">const</span> interpreter = <span class="keyword">new</span> Interpreter(text)</span><br><span class="line">interpreter.getNextToken() <span class="comment">// Token &#123; type: 'INTEGER', value: 3 &#125;</span></span><br><span class="line">interpreter.getNextToken() <span class="comment">// Token &#123; type: 'PLUS', value: '+' &#125;</span></span><br><span class="line">interpreter.getNextToken() <span class="comment">// Token &#123; type: 'INTEGER', value: 5 &#125;</span></span><br><span class="line">interpreter.getNextToken() <span class="comment">// Token &#123; type: 'EOF', value: null &#125;</span></span><br></pre></td></tr></table></figure>
+<p>方法 <code>expr</code> 确保 token 序列是正确的，如 INTEGER -&gt; PLUS -&gt; INTEGER，然后再进行加法运算。</p>
+<p>以上差不多就是解释器里的 Hello World 例子。</p>
+
+      
+    </div>
+
+    
+      
+      
+
+  <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="http://code.xnix.me">XueSeason</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="http://code.xnix.me/2018/05/07/简单解释器构造-Part-1/">http://code.xnix.me/2018/05/07/简单解释器构造-Part-1/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span>
+      
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/Interpreter/">Interpreter</a>
+            
+          </div>
+        
+        
+        
+  <nav class="post-nav">
+    
+    
+      <a class="next" href="/2018/05/04/深入-ES-Modules/">
+        <span class="next-text nav-default">深入 ES Modules（译）</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    
+  </nav>
+
+      </footer>
+    
+
+  </article>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+      </main>
+
+      <footer id="footer" class="footer">
+
+  <div class="social-links">
+    
+      
+        
+          <a href="mailto:xueseason@icloud.com" class="iconfont icon-email" title="email"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://github.com/xueseason" class="iconfont icon-github" title="github"></a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+          <a href="https://instagram.com/xue_season" class="iconfont icon-instagram" title="instagram"></a>
+        
+      
+    
+    
+    
+      <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    
+  </div>
+
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    
+    &copy; 
+     
+      2016 - 
+    
+    2018
+
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">XueSeason</span>
+  </span>
+</div>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+
+    
+  
+  
+
+  
+
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  
+
+  
+
+
+    <script type="text/javascript" src="/js/src/even.js?v=2.6.0"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=2.6.0"></script>
+
+  </body>
+</html>
