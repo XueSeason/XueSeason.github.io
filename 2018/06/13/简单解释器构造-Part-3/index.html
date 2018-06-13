@@ -17,7 +17,7 @@
 
 
 
-  <meta name="description" content="Make coding more interesting."/>
+  <meta name="description" content="简单解释器构造 - Part.3"/>
 
 
 
@@ -42,7 +42,7 @@
 
 
 
-<link rel="canonical" href="http://code.xnix.me/"/>
+<link rel="canonical" href="http://code.xnix.me/2018/06/13/简单解释器构造-Part-3/"/>
 
 
 <link rel="stylesheet" type="text/css" href="/css/style.css?v=2.6.0" />
@@ -97,7 +97,7 @@
 
 
 
-    <title> Code Craft </title>
+    <title> 简单解释器构造 - Part.3 - Code Craft </title>
   </head>
 
   <body><div id="mobile-navbar" class="mobile-navbar">
@@ -172,14 +172,12 @@
         <div class="content-wrapper">
           <div id="content" class="content">
             
-  <section id="posts" class="posts">
-    
-      
+  
   <article class="post">
     <header class="post-header">
       <h1 class="post-title">
         
-          <a class="post-link" href="/2018/06/13/简单解释器构造-Part-3/">简单解释器构造 - Part.3</a>
+          简单解释器构造 - Part.3
         
       </h1>
 
@@ -203,11 +201,7 @@
 
     <div class="post-content">
       
-        
-        
-
-        
-          <p>现在我们实现数学表达式的解释，例如：”7 - 3 + 2 - 1”。</p>
+        <p>现在我们实现数学表达式的解释，例如：”7 - 3 + 2 - 1”。</p>
 <p>本章数学表达式的语法图如下：</p>
 <p><img src="https://ruslanspivak.com/lsbasi-part3/lsbasi_part3_syntax_diagram.png" alt="syntax diagram"></p>
 <p>语法图代表了编程语言的语法规则，同时能帮助你编写解释器。</p>
@@ -220,485 +214,69 @@
 <p>最终的代码：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Token types</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> INTEGER = <span class="string">'INTEGER'</span></span><br><span class="line"><span class="keyword">const</span> PLUS = <span class="string">'PLUS'</span></span><br><span class="line"><span class="keyword">const</span> MINUS = <span class="string">'MINUS'</span></span><br><span class="line"><span class="keyword">const</span> EOF = <span class="string">'EOF'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Token</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span> (type, value) &#123;</span><br><span class="line">    <span class="comment">// token type: INTEGER, PLUS or EOF</span></span><br><span class="line">    <span class="keyword">this</span>.type = type</span><br><span class="line">    <span class="comment">// token value: 0, 1, 2, 3, 4, 8, 9, '+', or None</span></span><br><span class="line">    <span class="keyword">this</span>.value = value</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * String representation of the class instance.</span></span><br><span class="line"><span class="comment">   * Examples:</span></span><br><span class="line"><span class="comment">   *     Token(INTEGER, 3)</span></span><br><span class="line"><span class="comment">   *     Token(PLUS, +)</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  toString () &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`Token(<span class="subst">$&#123;<span class="keyword">this</span>.type&#125;</span>, <span class="subst">$&#123;<span class="keyword">this</span>.value&#125;</span>)`</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Interpreter</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span> (text) &#123;</span><br><span class="line">    <span class="comment">// client string input, e.g. "3+5", "12 - 5", etc</span></span><br><span class="line">    <span class="keyword">this</span>.text = text</span><br><span class="line">    <span class="comment">// this.pos is an index into this.text</span></span><br><span class="line">    <span class="keyword">this</span>.pos = <span class="number">0</span></span><br><span class="line">    <span class="comment">// current token instance</span></span><br><span class="line">    <span class="keyword">this</span>.currentToken = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">this</span>.currentChar = <span class="keyword">this</span>.text[<span class="keyword">this</span>.pos]</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Advance the 'pos' pointer and set the 'current_char' variable.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  advance () &#123;</span><br><span class="line">    <span class="keyword">this</span>.pos += <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.pos &gt; <span class="keyword">this</span>.text.length - <span class="number">1</span>) &#123;</span><br><span class="line">      <span class="keyword">this</span>.currentChar = <span class="literal">null</span> <span class="comment">// Indicates end of input</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.currentChar = <span class="keyword">this</span>.text[<span class="keyword">this</span>.pos]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  skipWhitespace () &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">this</span>.currentChar !== <span class="literal">null</span> &amp;&amp; <span class="keyword">this</span>.currentChar === <span class="string">' '</span>) &#123;</span><br><span class="line">      <span class="keyword">this</span>.advance()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Return a(multidigit) integer consumed from the input.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  integer () &#123;</span><br><span class="line">    <span class="keyword">let</span> result = <span class="string">''</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">this</span>.currentChar !== <span class="literal">null</span> &amp;&amp; <span class="built_in">Number</span>.isInteger(+<span class="keyword">this</span>.currentChar)) &#123;</span><br><span class="line">      result += <span class="keyword">this</span>.currentChar</span><br><span class="line">      <span class="keyword">this</span>.advance()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> +result</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Lexical analyzer (also known as scanner or tokenizer)</span></span><br><span class="line"><span class="comment">   * This method is responsible for breaking a sentence</span></span><br><span class="line"><span class="comment">   * apart into tokens. One part at a time.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  getNextToken () &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">this</span>.currentChar !== <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.currentChar === <span class="string">' '</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.skipWhitespace()</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (<span class="built_in">Number</span>.isInteger(+<span class="keyword">this</span>.currentChar)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Token(INTEGER, <span class="keyword">this</span>.integer())</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.currentChar === <span class="string">'+'</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.advance()</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Token(PLUS, <span class="string">'+'</span>)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.currentChar === <span class="string">'-'</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.advance()</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Token(MINUS, <span class="string">'-'</span>)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Error pasring input'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Token(EOF, <span class="literal">null</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  eat (tokenType) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.currentToken.type === tokenType) &#123;</span><br><span class="line">      <span class="keyword">this</span>.currentToken = <span class="keyword">this</span>.getNextToken()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Error pasring input'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  term () &#123;</span><br><span class="line">    <span class="keyword">const</span> token = <span class="keyword">this</span>.currentToken</span><br><span class="line">    <span class="keyword">this</span>.eat(INTEGER)</span><br><span class="line">    <span class="keyword">return</span> token.value</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * expr -&gt; INTEGER PLUS INTEGER</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  expr () &#123;</span><br><span class="line">    <span class="comment">// set current token to the first token taken from the input</span></span><br><span class="line">    <span class="keyword">this</span>.currentToken = <span class="keyword">this</span>.getNextToken()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> result = <span class="keyword">this</span>.term()</span><br><span class="line">    <span class="keyword">while</span> ([PLUS, MINUS].includes(<span class="keyword">this</span>.currentToken.type)) &#123;</span><br><span class="line">      <span class="keyword">const</span> token = <span class="keyword">this</span>.currentToken</span><br><span class="line">      <span class="keyword">if</span> (token.type === PLUS) &#123;</span><br><span class="line">        <span class="keyword">this</span>.eat(PLUS)</span><br><span class="line">        result += <span class="keyword">this</span>.term()</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (token.type === MINUS) &#123;</span><br><span class="line">        <span class="keyword">this</span>.eat(MINUS)</span><br><span class="line">        result -= <span class="keyword">this</span>.term()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> text = <span class="string">'10 + 1 + 2 - 3 + 4 + 6 - 15'</span></span><br><span class="line">  <span class="keyword">const</span> interpreter = <span class="keyword">new</span> Interpreter(text)</span><br><span class="line">  <span class="built_in">console</span>.log(interpreter.expr())</span><br><span class="line">&#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">  <span class="built_in">console</span>.error(error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-        
       
     </div>
 
     
-
-    
-
-  </article>
-
-    
       
-  <article class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        
-          <a class="post-link" href="/2018/05/15/Generator-之旅/">Generator 之旅</a>
-        
-      </h1>
+      
 
-      <div class="post-meta">
-        <span class="post-time">
-          2018-05-15
-        </span>
+  <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="http://code.xnix.me">XueSeason</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="http://code.xnix.me/2018/06/13/简单解释器构造-Part-3/">http://code.xnix.me/2018/06/13/简单解释器构造-Part-3/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span>
+      
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+
+
+
+      
+      
+    
+
+    
+      <footer class="post-footer">
         
-        
-        <div class="post-visits"
-             data-url="/2018/05/15/Generator-之旅/"
-             data-title="Generator 之旅">
-            阅读次数
+          <div class="post-tags">
+            
+              <a href="/tags/Interpreter/">Interpreter</a>
+            
           </div>
         
-      </div>
-    </header>
-
+        
+        
+  <nav class="post-nav">
     
     
-
-    <div class="post-content">
-      
-        
-        
-          
-        
-
-        
-          <p>最近在写一个 egg 的项目，用到了 ali-oss 这个库，发现是通过 generator 来解决异步。自从 Node v7.6.0 开始支持 async/await 特性，大部分场景都没有再接触 generator。突然对这个在 ES6 版本引入的语法变得陌生，决定好好总结下。<br>
-          <div class="read-more">
-            <a href="/2018/05/15/Generator-之旅/" class="read-more-link">阅读更多</a>
-          </div>
-        
-      
-    </div>
-
-    
-
-    
-
-  </article>
-
-    
-      
-  <article class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        
-          <a class="post-link" href="/2018/05/07/简单解释器构造-Part-2/">简单解释器构造 - Part.2</a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-05-07
-        </span>
-        
-        
-        <div class="post-visits"
-             data-url="/2018/05/07/简单解释器构造-Part-2/"
-             data-title="简单解释器构造 - Part.2">
-            阅读次数
-          </div>
-        
-      </div>
-    </header>
-
-    
-    
-
-    <div class="post-content">
-      
-        
-        
-          
-        
-
-        
-          <p>现在我们可以让解释器稍微复杂点：<br>
-          <div class="read-more">
-            <a href="/2018/05/07/简单解释器构造-Part-2/" class="read-more-link">阅读更多</a>
-          </div>
-        
-      
-    </div>
-
-    
-
-    
-
-  </article>
-
-    
-      
-  <article class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        
-          <a class="post-link" href="/2018/05/07/简单解释器构造-Part-1/">简单解释器构造 - Part.1</a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-05-07
-        </span>
-        
-        
-        <div class="post-visits"
-             data-url="/2018/05/07/简单解释器构造-Part-1/"
-             data-title="简单解释器构造 - Part.1">
-            阅读次数
-          </div>
-        
-      </div>
-    </header>
-
-    
-    
-
-    <div class="post-content">
-      
-        
-        
-          
-        
-
-        
-          <p>无论你是新手还是经验丰富的开发者，如果你不知道编译器和解释器的工作原理，你也不会知道计算机是如何工作的。<br>
-          <div class="read-more">
-            <a href="/2018/05/07/简单解释器构造-Part-1/" class="read-more-link">阅读更多</a>
-          </div>
-        
-      
-    </div>
-
-    
-
-    
-
-  </article>
-
-    
-      
-  <article class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        
-          <a class="post-link" href="/2018/05/04/深入-ES-Modules/">深入 ES Modules（译）</a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-05-04
-        </span>
-        
-        
-        <div class="post-visits"
-             data-url="/2018/05/04/深入-ES-Modules/"
-             data-title="深入 ES Modules（译）">
-            阅读次数
-          </div>
-        
-      </div>
-    </header>
-
-    
-    
-
-    <div class="post-content">
-      
-        
-        
-          
-        
-
-        
-          <p>ES Modules 使 JS 的模块系统标准化。这一标准化的工作差不多经历了 10 年。</p>
-<p>随着今年 5 月份 Firefox 60 的发布，所有的主流浏览器都将支持 ES Modules。此外 Node.js 团队当前也正在支持 ES Modules。代表 Web 未来的 WebAssembly 也正在集成 ES Modules。</p>
-<p>让我们先看看 ES Modules 解决了什么问题以及和其他模块系统的不同。<br>
-          <div class="read-more">
-            <a href="/2018/05/04/深入-ES-Modules/" class="read-more-link">阅读更多</a>
-          </div>
-        
-      
-    </div>
-
-    
-
-    
-
-  </article>
-
-    
-      
-  <article class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        
-          <a class="post-link" href="/2018/05/02/Rollup-初探/">Rollup 初探</a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-05-02
-        </span>
-        
-        
-        <div class="post-visits"
-             data-url="/2018/05/02/Rollup-初探/"
-             data-title="Rollup 初探">
-            阅读次数
-          </div>
-        
-      </div>
-    </header>
-
-    
-    
-
-    <div class="post-content">
-      
-        
-        
-          
-        
-
-        
-          <p>在传统软件开发的领域中，模块化开发将项目拆分成多个独立的模块便于维护。但是在过去 JS 因为历史原因而不具备这一核心功能。直到 ES6 带来了 ES Modules，但是这些并没有在浏览器和 Node.js 下实现。<br>
-          <div class="read-more">
-            <a href="/2018/05/02/Rollup-初探/" class="read-more-link">阅读更多</a>
-          </div>
-        
-      
-    </div>
-
-    
-
-    
-
-  </article>
-
-    
-      
-  <article class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        
-          <a class="post-link" href="/2018/04/28/原型链理解/">原型链理解</a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-04-28
-        </span>
-        
-        
-        <div class="post-visits"
-             data-url="/2018/04/28/原型链理解/"
-             data-title="原型链理解">
-            阅读次数
-          </div>
-        
-      </div>
-    </header>
-
-    
-    
-
-    <div class="post-content">
-      
-        
-        
-          
-        
-
-        
-          <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span> (<span class="params"></span>) </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
-          <div class="read-more">
-            <a href="/2018/04/28/原型链理解/" class="read-more-link">阅读更多</a>
-          </div>
-        
-      
-    </div>
-
-    
-
-    
-
-  </article>
-
-    
-      
-  <article class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        
-          <a class="post-link" href="/2018/03/08/函数式编程/">函数式编程</a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-03-08
-        </span>
-        
-        
-        <div class="post-visits"
-             data-url="/2018/03/08/函数式编程/"
-             data-title="函数式编程">
-            阅读次数
-          </div>
-        
-      </div>
-    </header>
-
-    
-    
-
-    <div class="post-content">
-      
-        
-        
-          
-        
-
-        
-          <p>命令式（How to do） -&gt; 声明式（do What）<br>
-          <div class="read-more">
-            <a href="/2018/03/08/函数式编程/" class="read-more-link">阅读更多</a>
-          </div>
-        
-      
-    </div>
-
-    
-
-    
-
-  </article>
-
-    
-      
-  <article class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        
-          <a class="post-link" href="/2018/01/15/打造理想的前端团队/">打造理想的前端团队</a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-01-15
-        </span>
-        
-        
-        <div class="post-visits"
-             data-url="/2018/01/15/打造理想的前端团队/"
-             data-title="打造理想的前端团队">
-            阅读次数
-          </div>
-        
-      </div>
-    </header>
-
-    
-    
-
-    <div class="post-content">
-      
-        
-        
-          
-        
-
-        
-          <h2 id="全栈的心"><a href="#全栈的心" class="headerlink" title="全栈的心"></a>全栈的心</h2>
-          <div class="read-more">
-            <a href="/2018/01/15/打造理想的前端团队/" class="read-more-link">阅读更多</a>
-          </div>
-        
-      
-    </div>
-
-    
-
-    
-
-  </article>
-
-    
-      
-  <article class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        
-          <a class="post-link" href="/2017/12/29/2017-回顾/">2017 回顾</a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2017-12-29
-        </span>
-        
-        
-        <div class="post-visits"
-             data-url="/2017/12/29/2017-回顾/"
-             data-title="2017 回顾">
-            阅读次数
-          </div>
-        
-      </div>
-    </header>
-
-    
-    
-
-    <div class="post-content">
-      
-        
-        
-          
-        
-
-        
-          <p>今天是 2017 年最后一个工作日，相比以往最大的不同就是满满地工作了一年，心态也发生了很大的改变。最主要的原因还是进入社会这个大染缸，想进一步改变自己人生的风向开始变得更加困难。总的来说，这一年对自己的表现，我是不太满意的。<br>
-          <div class="read-more">
-            <a href="/2017/12/29/2017-回顾/" class="read-more-link">阅读更多</a>
-          </div>
-        
-      
-    </div>
-
-    
-
-    
-
-  </article>
-
-    
-  </section>
-
-  
-  <nav class="pagination">
-    
-    
-      <a class="next" href="/page/2/">
-        <span class="next-text">下一页</span>
+      <a class="next" href="/2018/05/15/Generator-之旅/">
+        <span class="next-text nav-default">Generator 之旅</span>
+        <span class="prev-text nav-mobile">下一篇</span>
         <i class="iconfont icon-right"></i>
       </a>
     
   </nav>
 
+      </footer>
+    
+
+  </article>
+
 
           </div>
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
       </main>
@@ -785,6 +363,11 @@
     </div>
 
     
+  
+  
+
+  
+
 
 
     
